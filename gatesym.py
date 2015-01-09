@@ -1,4 +1,4 @@
-from collections import tuple
+from collections import namedtuple
 
 
 TIE, AND, OR = range(3)
@@ -6,66 +6,193 @@ TIE, AND, OR = range(3)
 
 class Gate(namedtuple("Gate", "type_, inputs, neg_inputs, outputs")):
     def __new__(cls, type_):
-        super(Gate, cls).__new__(type_, set(), set())
+        return super(Gate, cls).__new__(cls, type_, set(), set(), set())
 
 
 class GateNetwork(object):
     def __init__(self):
-        self._gates = []
-        self._values = []
-        self.queue = set()
+        self._gates = [None]
+        self._values = [None]
+        self._queue = set()
 
-    def add_gate(self, type_, inputs=[], neg_inputs=[]):
-        index = len(self.gates)
+    def add_gate(self, type_, *inputs):
+        index = len(self._gates)
         self._gates.append(Gate(type_))
         self._values.append(False)
 
-        for input in inputs:
-            self.add_link(input, index)
-        for input in neg_inputs:
-            self.add_link(input, index, True)
+        for input_ in inputs:
+            self.add_link(input_, index)
 
         return index
 
-    def add_link(self, source, destination, negate=False):
+    def add_link(self, source, destination):
         dest_gate = self._gates[destination]
         assert dest_gate.type_ != TIE
-        self._gates[source].outputs.add(destination)
-        if negate:
-            dest_gate.neg_inputs.add(source)
+        self._gates[abs(source)].outputs.add(destination)
+        if source < 0:
+            dest_gate.neg_inputs.add(abs(source))
         else:
             dest_gate.inputs.add(source)
-        self.queue.add(destination)
+        self._queue.add(destination)
 
     def get(self, index):
-        return self.values[index]
+        return self._values[index]
 
     def set(self, index, value):
-        gate = self.gates[index]
+        gate = self._gates[index]
         assert gate.type_ == TIE
-        self.values[index] = value
-        self.queue.update(gate.outputs)
+        self._values[index] = value
+        self._queue.update(gate.outputs)
 
     def step(self):
-        queue = self.queue
-        self.queue = set()
+        queue = self._queue
+        self._queue = set()
 
         for index in queue:
             gate = self._gates[index]
 
             if gate.type_ == AND:
-                i = all(self.values[i] for i in gate.inputs)
-                ni = any(self.values[i] for i in gate.neg_inputs)
-                res = i and not ni
+                a = [self._values[i] for i in gate.inputs]
+                b = [not self._values[i] for i in gate.neg_inputs]
+                res = all(a + b)
             elif gate.type_ == OR:
-                i = any(self.values[i] for i in gate.inputs)
-                ni = all(self.values[i] for i in gate.neg_inputs)
-                res = i and not ni
+                a = [self._values[i] for i in gate.inputs]
+                b = [not self._values[i] for i in gate.neg_inputs]
+                res = any(a + b)
             else:
                 assert False, gate.type_
 
-            if self.values[index] != res:
-                self.values[index] = res
-                self.queue.update(gate.destination)
+            if self._values[index] != res:
+                self._values[index] = res
+                self._queue.update(gate.outputs)
 
-        return bool(self.queue)
+        return bool(self._queue)
+
+    def drain(self):
+        print ".",
+        while self.step():
+            print ".",
+            pass
+        print
+
+
+def Not(input_):
+    return -input_
+
+
+def half_adder(network, a, b):
+    carry = network.add_gate(AND, a, b)
+    result = network.add_gate(
+        OR,
+        network.add_gate(AND, a, Not(b)),
+        network.add_gate(AND, Not(a), b),
+    )
+    return result, carry
+
+
+def full_adder(network, a, b, c):
+    s1, c1 = half_adder(network, a, b)
+    s2, c2 = half_adder(network, s1, c)
+    return s2, network.add_gate(OR, c1, c2)
+
+
+def test_half_adder():
+    network = GateNetwork()
+    a = network.add_gate(TIE)
+    b = network.add_gate(TIE)
+    r, c = half_adder(network, a, b)
+    network.drain()
+
+    network.set(a, False)
+    network.set(b, False)
+    network.drain()
+    assert not network.get(r)
+    assert not network.get(c)
+
+    network.set(a, True)
+    network.set(b, False)
+    network.drain()
+    assert network.get(r)
+    assert not network.get(c)
+
+    network.set(a, False)
+    network.set(b, True)
+    network.drain()
+    assert network.get(r)
+    assert not network.get(c)
+
+    network.set(a, True)
+    network.set(b, True)
+    network.drain()
+    assert not network.get(r)
+    assert network.get(c)
+
+
+def test_full_adder():
+    network = GateNetwork()
+    a = network.add_gate(TIE)
+    b = network.add_gate(TIE)
+    c = network.add_gate(TIE)
+    r, co = full_adder(network, a, b, c)
+    network.drain()
+
+    network.set(a, False)
+    network.set(b, False)
+    network.set(c, False)
+    network.drain()
+    assert not network.get(r)
+    assert not network.get(co)
+
+    network.set(a, True)
+    network.set(b, False)
+    network.set(c, False)
+    network.drain()
+    assert network.get(r)
+    assert not network.get(co)
+
+    network.set(a, False)
+    network.set(b, True)
+    network.set(c, False)
+    network.drain()
+    assert network.get(r)
+    assert not network.get(co)
+
+    network.set(a, True)
+    network.set(b, True)
+    network.set(c, False)
+    network.drain()
+    assert not network.get(r)
+    assert network.get(co)
+
+    network.set(a, False)
+    network.set(b, False)
+    network.set(c, True)
+    network.drain()
+    assert network.get(r)
+    assert not network.get(co)
+
+    network.set(a, True)
+    network.set(b, False)
+    network.set(c, True)
+    network.drain()
+    assert not network.get(r)
+    assert network.get(co)
+
+    network.set(a, False)
+    network.set(b, True)
+    network.set(c, True)
+    network.drain()
+    assert not network.get(r)
+    assert network.get(co)
+
+    network.set(a, True)
+    network.set(b, True)
+    network.set(c, True)
+    network.drain()
+    assert network.get(r)
+    assert network.get(co)
+
+
+if __name__ == "__main__":
+    test_half_adder()
+    test_full_adder()
