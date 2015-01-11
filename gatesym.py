@@ -6,10 +6,14 @@ TIE, AND, OR = range(3)
 
 class Gate(object):
     # handles to gate objects
-    def __init__(self, network, index):
+    def __init__(self, network, index, inputs):
         self.network = network
         self.index = index
+        for input_ in inputs:
+            network.add_link(input_, self)
 
+    def __repr__(self):
+        return "{self.index}".format(self=self)
 
 class _Gate(namedtuple("Gate", "type_, inputs, neg_inputs, outputs")):
     # internal gate format
@@ -23,20 +27,17 @@ class GateNetwork(object):
         self._values = [None]
         self._queue = set()
 
-    def add_gate(self, type_, *inputs):
+    def add_gate(self, type_):
+        assert type_ in [TIE, AND, OR]
         index = len(self._gates)
         self._gates.append(_Gate(type_))
         self._values.append(False)
-        gate = Gate(self, index)
-
-        for input_ in inputs:
-            self.add_link(input_, gate)
-
-        return gate
+        return index
 
     def add_link(self, source, destination):
         assert source.network is self
         assert destination.network is self
+        assert destination.index > 0
         dest_gate = self._gates[destination.index]
         assert dest_gate.type_ != TIE
         self._gates[abs(source.index)].outputs.add(destination.index)
@@ -52,6 +53,7 @@ class GateNetwork(object):
 
     def set(self, gate, value):
         assert gate.network is self
+        assert gate.index > 0
         r_gate = self._gates[gate.index]
         assert r_gate.type_ == TIE
         self._values[gate.index] = value
@@ -89,31 +91,49 @@ class GateNetwork(object):
         print
 
 
+class Tie(Gate):
+    def __init__(self, network, value=False):
+        index = network.add_gate(TIE)
+        super(Tie, self).__init__(network, index, [])
+        network.set(self, value)
+
+
 def Not(gate):
-    return Gate(gate.network, -gate.index)
+    return Gate(gate.network, -gate.index, [])
 
 
-def half_adder(network, a, b):
-    carry = network.add_gate(AND, a, b)
-    result = network.add_gate(
-        OR,
-        network.add_gate(AND, a, Not(b)),
-        network.add_gate(AND, Not(a), b),
-    )
+class And(Gate):
+    def __init__(self, *inputs):
+        network = inputs[0].network
+        index = network.add_gate(AND)
+        super(And, self).__init__(network, index, inputs)
+
+
+class Or(Gate):
+    def __init__(self, *inputs):
+        network = inputs[0].network
+        index = network.add_gate(OR)
+        super(Or, self).__init__(network, index, inputs)
+
+
+
+def half_adder(a, b):
+    carry = And(a, b)
+    result = Or(And(a, Not(b)), And(Not(a), b))
     return result, carry
 
 
-def full_adder(network, a, b, c):
-    s1, c1 = half_adder(network, a, b)
-    s2, c2 = half_adder(network, s1, c)
-    return s2, network.add_gate(OR, c1, c2)
+def full_adder(a, b, c):
+    s1, c1 = half_adder(a, b)
+    s2, c2 = half_adder(s1, c)
+    return s2, Or(c1, c2)
 
 
 def test_half_adder():
     network = GateNetwork()
-    a = network.add_gate(TIE)
-    b = network.add_gate(TIE)
-    r, c = half_adder(network, a, b)
+    a = Tie(network)
+    b = Tie(network)
+    r, c = half_adder(a, b)
     network.drain()
 
     network.set(a, False)
@@ -143,10 +163,10 @@ def test_half_adder():
 
 def test_full_adder():
     network = GateNetwork()
-    a = network.add_gate(TIE)
-    b = network.add_gate(TIE)
-    c = network.add_gate(TIE)
-    r, co = full_adder(network, a, b, c)
+    a = Tie(network)
+    b = Tie(network)
+    c = Tie(network)
+    r, co = full_adder(a, b, c)
     network.drain()
 
     network.set(a, False)
