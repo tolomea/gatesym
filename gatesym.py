@@ -15,6 +15,10 @@ class Gate(object):
     def __repr__(self):
         return "{self.index}".format(self=self)
 
+    def read(self):
+        return self.network.read(self)
+
+
 class _Gate(namedtuple("Gate", "type_, inputs, neg_inputs, outputs")):
     # internal gate format
     def __new__(cls, type_):
@@ -47,11 +51,14 @@ class GateNetwork(object):
             dest_gate.inputs.add(source.index)
         self._queue.add(destination.index)
 
-    def get(self, gate):
+    def read(self, gate):
         assert gate.network is self
-        return self._values[gate.index]
+        if gate.index < 0:
+            return not self._values[-gate.index]
+        else:
+            return self._values[gate.index]
 
-    def set(self, gate, value):
+    def write(self, gate, value):
         assert gate.network is self
         assert gate.index > 0
         r_gate = self._gates[gate.index]
@@ -95,7 +102,10 @@ class Tie(Gate):
     def __init__(self, network, value=False):
         index = network.add_gate(TIE)
         super(Tie, self).__init__(network, index, [])
-        network.set(self, value)
+        self.write(value)
+
+    def write(self, value):
+        self.network.write(self, value)
 
 
 def Not(gate):
@@ -136,29 +146,29 @@ def test_half_adder():
     r, c = half_adder(a, b)
     network.drain()
 
-    network.set(a, False)
-    network.set(b, False)
+    a.write(False)
+    b.write(False)
     network.drain()
-    assert not network.get(r)
-    assert not network.get(c)
+    assert not r.read()
+    assert not c.read()
 
-    network.set(a, True)
-    network.set(b, False)
+    a.write(True)
+    b.write(False)
     network.drain()
-    assert network.get(r)
-    assert not network.get(c)
+    assert r.read()
+    assert not c.read()
 
-    network.set(a, False)
-    network.set(b, True)
+    a.write(False)
+    b.write(True)
     network.drain()
-    assert network.get(r)
-    assert not network.get(c)
+    assert r.read()
+    assert not c.read()
 
-    network.set(a, True)
-    network.set(b, True)
+    a.write(True)
+    b.write(True)
     network.drain()
-    assert not network.get(r)
-    assert network.get(c)
+    assert not r.read()
+    assert c.read()
 
 
 def test_full_adder():
@@ -169,61 +179,61 @@ def test_full_adder():
     r, co = full_adder(a, b, c)
     network.drain()
 
-    network.set(a, False)
-    network.set(b, False)
-    network.set(c, False)
+    a.write(False)
+    b.write(False)
+    c.write(False)
     network.drain()
-    assert not network.get(r)
-    assert not network.get(co)
+    assert not r.read()
+    assert not co.read()
 
-    network.set(a, True)
-    network.set(b, False)
-    network.set(c, False)
+    a.write(True)
+    b.write(False)
+    c.write(False)
     network.drain()
-    assert network.get(r)
-    assert not network.get(co)
+    assert r.read()
+    assert not co.read()
 
-    network.set(a, False)
-    network.set(b, True)
-    network.set(c, False)
+    a.write(False)
+    b.write(True)
+    c.write(False)
     network.drain()
-    assert network.get(r)
-    assert not network.get(co)
+    assert r.read()
+    assert not co.read()
 
-    network.set(a, True)
-    network.set(b, True)
-    network.set(c, False)
+    a.write(True)
+    b.write(True)
+    c.write(False)
     network.drain()
-    assert not network.get(r)
-    assert network.get(co)
+    assert not r.read()
+    assert co.read()
 
-    network.set(a, False)
-    network.set(b, False)
-    network.set(c, True)
+    a.write(False)
+    b.write(False)
+    c.write(True)
     network.drain()
-    assert network.get(r)
-    assert not network.get(co)
+    assert r.read()
+    assert not co.read()
 
-    network.set(a, True)
-    network.set(b, False)
-    network.set(c, True)
+    a.write(True)
+    b.write(False)
+    c.write(True)
     network.drain()
-    assert not network.get(r)
-    assert network.get(co)
+    assert not r.read()
+    assert co.read()
 
-    network.set(a, False)
-    network.set(b, True)
-    network.set(c, True)
+    a.write(False)
+    b.write(True)
+    c.write(True)
     network.drain()
-    assert not network.get(r)
-    assert network.get(co)
+    assert not r.read()
+    assert co.read()
 
-    network.set(a, True)
-    network.set(b, True)
-    network.set(c, True)
+    a.write(True)
+    b.write(True)
+    c.write(True)
     network.drain()
-    assert network.get(r)
-    assert network.get(co)
+    assert r.read()
+    assert co.read()
 
 
 if __name__ == "__main__":
