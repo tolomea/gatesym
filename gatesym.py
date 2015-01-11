@@ -4,9 +4,17 @@ from collections import namedtuple
 TIE, AND, OR = range(3)
 
 
-class Gate(namedtuple("Gate", "type_, inputs, neg_inputs, outputs")):
+class Gate(object):
+    # handles to gate objects
+    def __init__(self, network, index):
+        self.network = network
+        self.index = index
+
+
+class _Gate(namedtuple("Gate", "type_, inputs, neg_inputs, outputs")):
+    # internal gate format
     def __new__(cls, type_):
-        return super(Gate, cls).__new__(cls, type_, set(), set(), set())
+        return super(_Gate, cls).__new__(cls, type_, set(), set(), set())
 
 
 class GateNetwork(object):
@@ -17,32 +25,37 @@ class GateNetwork(object):
 
     def add_gate(self, type_, *inputs):
         index = len(self._gates)
-        self._gates.append(Gate(type_))
+        self._gates.append(_Gate(type_))
         self._values.append(False)
+        gate = Gate(self, index)
 
         for input_ in inputs:
-            self.add_link(input_, index)
+            self.add_link(input_, gate)
 
-        return index
+        return gate
 
     def add_link(self, source, destination):
-        dest_gate = self._gates[destination]
+        assert source.network is self
+        assert destination.network is self
+        dest_gate = self._gates[destination.index]
         assert dest_gate.type_ != TIE
-        self._gates[abs(source)].outputs.add(destination)
-        if source < 0:
-            dest_gate.neg_inputs.add(abs(source))
+        self._gates[abs(source.index)].outputs.add(destination.index)
+        if source.index < 0:
+            dest_gate.neg_inputs.add(abs(source.index))
         else:
-            dest_gate.inputs.add(source)
-        self._queue.add(destination)
+            dest_gate.inputs.add(source.index)
+        self._queue.add(destination.index)
 
-    def get(self, index):
-        return self._values[index]
+    def get(self, gate):
+        assert gate.network is self
+        return self._values[gate.index]
 
-    def set(self, index, value):
-        gate = self._gates[index]
-        assert gate.type_ == TIE
-        self._values[index] = value
-        self._queue.update(gate.outputs)
+    def set(self, gate, value):
+        assert gate.network is self
+        r_gate = self._gates[gate.index]
+        assert r_gate.type_ == TIE
+        self._values[gate.index] = value
+        self._queue.update(r_gate.outputs)
 
     def step(self):
         queue = self._queue
@@ -76,8 +89,8 @@ class GateNetwork(object):
         print
 
 
-def Not(input_):
-    return -input_
+def Not(gate):
+    return Gate(gate.network, -gate.index)
 
 
 def half_adder(network, a, b):
