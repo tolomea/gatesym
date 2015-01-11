@@ -6,7 +6,7 @@ TIE, AND, OR = range(3)
 
 class Gate(object):
     # handles to gate objects
-    def __init__(self, network, index, inputs):
+    def __init__(self, network, index, inputs=[]):
         self.network = network
         self.index = index
         for input_ in inputs:
@@ -101,7 +101,7 @@ class Network(object):
 class Tie(Gate):
     def __init__(self, network, value=False):
         index = network.add_gate(TIE)
-        super(Tie, self).__init__(network, index, [])
+        super(Tie, self).__init__(network, index)
         self.write(value)
 
     def write(self, value):
@@ -109,7 +109,7 @@ class Tie(Gate):
 
 
 def Not(gate):
-    return Gate(gate.network, -gate.index, [])
+    return Gate(gate.network, -gate.index)
 
 
 class And(Gate):
