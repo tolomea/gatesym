@@ -2,14 +2,14 @@ from __future__ import unicode_literals, division, absolute_import
 
 import random
 
-from gatesym import networks as adders
-from gatesym import gatesym
+from gatesym import adders
+from gatesym import core
 
 
 def test_half_adder():
-    network = gatesym.Network()
-    a = gatesym.Tie(network)
-    b = gatesym.Tie(network)
+    network = core.Network()
+    a = core.Tie(network)
+    b = core.Tie(network)
     r, c = adders.half_adder(a, b)
     network.drain()
 
@@ -39,10 +39,10 @@ def test_half_adder():
 
 
 def test_full_adder():
-    network = gatesym.Network()
-    a = gatesym.Tie(network)
-    b = gatesym.Tie(network)
-    c = gatesym.Tie(network)
+    network = core.Network()
+    a = core.Tie(network)
+    b = core.Tie(network)
+    c = core.Tie(network)
     r, co = adders.full_adder(a, b, c)
     network.drain()
 
@@ -104,11 +104,11 @@ def test_full_adder():
 
 
 def test_ripple_adder():
-    network = gatesym.Network()
-    a = gatesym.BinaryIn(network, 8)
-    b = gatesym.BinaryIn(network, 8)
+    network = core.Network()
+    a = core.BinaryIn(network, 8)
+    b = core.BinaryIn(network, 8)
     r, c = adders.ripple_adder(a, b)
-    r = gatesym.BinaryOut(r)
+    r = core.BinaryOut(r)
 
     for i in range(10):
         v1 = random.randrange(256)
