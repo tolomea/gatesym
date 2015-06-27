@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 
+import functools
 from collections import namedtuple
 
 
@@ -159,3 +160,25 @@ class BinaryOut(object):
                 res += idx
             idx *= 2
         return res
+
+
+class Block(object):
+    def __init__(self, name, inputs, args, outputs):
+        self.name = name
+        self.inputs = inputs
+        self.args = args
+        self.outputs = outputs
+
+    def __iter__(self):
+        return iter(self.outputs)
+
+
+def block():
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            print func.__name__, args, kwargs
+            res = func(*args, **kwargs)
+            return Block(func.__name__, args, kwargs, res)
+        return wrapper
+    return decorator
