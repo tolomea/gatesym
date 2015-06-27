@@ -1,3 +1,5 @@
+from __future__ import unicode_literals, division, absolute_import
+
 from collections import namedtuple
 
 
@@ -91,11 +93,10 @@ class Network(object):
         return bool(self._queue)
 
     def drain(self):
-        print ".",
+        count = 1
         while self.step():
-            print ".",
-            pass
-        print
+            count += 1
+        return count
 
 
 class Tie(Gate):
