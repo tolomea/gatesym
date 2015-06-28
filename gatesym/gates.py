@@ -1,7 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 
-import functools
 import collections
+
+from decorator import decorator
 
 from gatesym import core
 
@@ -120,14 +121,13 @@ class Block(object):
         self.outputs = outputs
 
 
-def block():
-    def decorator(func):
-        @functools.wraps(func)
-        def wrapper(*args, **kwargs):
-            args = proxy_factory(args, func.__name__)
-            res = func(*args, **kwargs)
-            res = proxy_factory(res, func.__name__)
-            Block(func.__name__, args, kwargs, res)
-            return res
-        return wrapper
-    return decorator
+def _block(func, *args, **kwargs):
+    args = proxy_factory(args, func.__name__)
+    res = func(*args, **kwargs)
+    res = proxy_factory(res, func.__name__)
+    Block(func.__name__, args, kwargs, res)
+    return res
+
+
+def block(func):
+    return decorator(_block, func)

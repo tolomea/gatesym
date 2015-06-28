@@ -3,7 +3,7 @@ from __future__ import unicode_literals, division, absolute_import
 from gatesym.gates import And, Not, block, nand
 
 
-@block()
+@block
 def gated_d_latch(data, clock):
     s = nand(data, clock)
     r = nand(s, clock)
@@ -14,13 +14,13 @@ def gated_d_latch(data, clock):
     return q2
 
 
-@block()
+@block
 def ms_d_flop(data, clock):
     l = gated_d_latch(data, clock)
     return gated_d_latch(l, Not(clock))
 
 
-@block()
+@block
 def register(data, clock):
     res = []
     for i in data:
