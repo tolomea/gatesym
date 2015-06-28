@@ -1,28 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
 
-import functools
-from collections import namedtuple
+import collections
 
 
 TIE, AND, OR = range(3)
 
 
-class Gate(object):
-    # handles to gate objects
-    def __init__(self, network, index, inputs=[]):
-        self.network = network
-        self.index = index
-        for input_ in inputs:
-            network.add_link(input_, self)
-
-    def __repr__(self):
-        return "{self.index}".format(self=self)
-
-    def read(self):
-        return self.network.read(self)
-
-
-class _Gate(namedtuple("Gate", "type_, inputs, neg_inputs, outputs")):
+class _Gate(collections.namedtuple("_Gate", "type_, inputs, neg_inputs, outputs")):
     # internal gate format
     def __new__(cls, type_):
         return super(_Gate, cls).__new__(cls, type_, set(), set(), set())
@@ -98,87 +82,3 @@ class Network(object):
         while self.step():
             count += 1
         return count
-
-
-class Tie(Gate):
-    def __init__(self, network, value=False):
-        index = network.add_gate(TIE)
-        super(Tie, self).__init__(network, index)
-        self.write(value)
-
-    def write(self, value):
-        self.network.write(self, value)
-
-
-def Not(gate):
-    return Gate(gate.network, -gate.index)
-
-
-class And(Gate):
-    def __init__(self, *inputs):
-        network = inputs[0].network
-        index = network.add_gate(AND)
-        super(And, self).__init__(network, index, inputs)
-
-
-class Or(Gate):
-    def __init__(self, *inputs):
-        network = inputs[0].network
-        index = network.add_gate(OR)
-        super(Or, self).__init__(network, index, inputs)
-
-
-class BinaryIn(object):
-    def __init__(self, network, size, value=0):
-        self.ties = [Tie(network) for i in range(size)]
-        self.write(value)
-
-    def write(self, value):
-        for tie in self.ties:
-            tie.write(value % 2)
-            value //= 2
-
-    def __iter__(self):
-        return iter(self.ties)
-
-    def __len__(self):
-        return len(self.ties)
-
-    def __getitem__(self, key):
-        return self.ties.__getitem__(key)
-
-
-class BinaryOut(object):
-    def __init__(self, gates):
-        self.gates = gates
-
-    def read(self):
-        res = 0
-        idx = 1
-        for gate in self.gates:
-            if gate.read():
-                res += idx
-            idx *= 2
-        return res
-
-
-class Block(object):
-    def __init__(self, name, inputs, args, outputs):
-        self.name = name
-        self.inputs = inputs
-        self.args = args
-        self.outputs = outputs
-
-    def __iter__(self):
-        return iter(self.outputs)
-
-
-def block():
-    def decorator(func):
-        @functools.wraps(func)
-        def wrapper(*args, **kwargs):
-            print func.__name__, args, kwargs
-            res = func(*args, **kwargs)
-            return Block(func.__name__, args, kwargs, res)
-        return wrapper
-    return decorator

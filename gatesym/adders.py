@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 
-from gatesym.core import And, Or, Not, block
+from gatesym.gates import And, Or, Not, block
 
 
 @block()
