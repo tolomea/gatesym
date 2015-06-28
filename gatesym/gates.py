@@ -38,8 +38,11 @@ class Gate(Link):
         self.network = network
         self.index = index
         for input_ in inputs:
-            input_.attach(self)
-            network.add_link(input_, self)
+            self.add_input(input_)
+
+    def add_input(self, input_):
+        input_.attach(self)
+        self.network.add_link(input_, self)
 
     def __repr__(self):
         return "{self.index}".format(self=self)
@@ -78,6 +81,10 @@ class Or(Gate):
         super(Or, self).__init__(network, index, "or", inputs)
 
 
+def nand(*inputs):
+    return Not(And(*inputs))
+
+
 class Proxy(Link):
     def __init__(self, gate, name):
         super(Proxy, self).__init__(name)
@@ -98,7 +105,7 @@ class Proxy(Link):
 
 def proxy_factory(obj, name):
     if isinstance(obj, collections.Iterable):
-        return [Proxy(o, name) for o in obj]
+        return [proxy_factory(o, name) for o in obj]
     else:
         return Proxy(obj, name)
 
@@ -108,19 +115,19 @@ class Block(object):
         self.name = name
         self.inputs = inputs
         self.args = args
+        if not isinstance(outputs, collections.Iterable):
+            outputs = [outputs]
         self.outputs = outputs
-
-    def __iter__(self):
-        return iter(self.outputs)
 
 
 def block():
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
-            args = [proxy_factory(arg, func.__name__) for arg in args]
+            args = proxy_factory(args, func.__name__)
             res = func(*args, **kwargs)
-            res = [proxy_factory(r, func.__name__) for r in res]
-            return Block(func.__name__, args, kwargs, res)
+            res = proxy_factory(res, func.__name__)
+            Block(func.__name__, args, kwargs, res)
+            return res
         return wrapper
     return decorator

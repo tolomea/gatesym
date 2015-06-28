@@ -73,3 +73,31 @@ call
 return
 
 """
+
+
+mov machine
+only instruction is address to address mov
+everything else is mapped into register space
+assume word size = address size = S
+main loop is 4 stage
+    1: read pc
+    2: read pc + 1
+    3: fetch
+    4: store
+bus
+    S address bits, only written by the core
+    S data bits, can be written by core or any module
+    clock line
+    r/w flag
+
+low literal module
+    2^(s/2) address range
+    address bits reflected back
+high literal module
+    2^(s/2) address range
+    address bits reflected back, shuffled by s/2
+math modules
+    4 address range
+    2 inputs
+    1-2 outputs
+
