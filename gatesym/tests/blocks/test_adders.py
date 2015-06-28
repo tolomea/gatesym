@@ -2,7 +2,8 @@ from __future__ import unicode_literals, division, absolute_import
 
 import random
 
-from gatesym import adders, core, gates, utils
+from gatesym import core, gates, utils
+from gatesym.blocks import adders
 
 
 def test_half_adder():

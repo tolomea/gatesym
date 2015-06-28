@@ -2,7 +2,8 @@ from __future__ import unicode_literals, division, absolute_import
 
 import random
 
-from gatesym import latches, core, gates, utils
+from gatesym import core, gates, utils
+from gatesym.blocks import latches
 
 
 def test_ms_d_flop_basic():
