@@ -89,7 +89,6 @@ bus
     S data bits, can be written by core or any module
     clock line
     r/w flag
-
 low literal module
     2^(s/2) address range
     address bits reflected back
