@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 
-from gatesym.gates import block, And, Tie
+from gatesym.gates import block, And
+from gatesym.utils import pad
 from gatesym.blocks.latches import register
 from gatesym.blocks.adders import ripple_adder
 from gatesym.blocks.mux import word_switch, address_decode
@@ -19,6 +20,6 @@ def add(clock, write, address, data_in):
     b = register(data_in, write_b)
 
     res, carry = ripple_adder(a, b)
-    carry = [carry] + [Tie(address[0].network) for i in range(len(data_in)-1)]
+    carry = pad([carry], len(data_in))
 
     return word_switch(control_lines, a, b, res, carry)
