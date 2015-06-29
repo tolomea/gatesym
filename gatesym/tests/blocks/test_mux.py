@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 
 import pytest
 
-from gatesym import core, utils
+from gatesym import core, test_utils
 from gatesym.blocks import mux
 
 
@@ -14,7 +14,7 @@ from gatesym.blocks import mux
 ])
 def test_address_decode(addr, a, b, c, d):
     network = core.Network()
-    address = utils.BinaryIn(network, 2)
+    address = test_utils.BinaryIn(network, 2)
     control_lines = mux.address_decode(address)
 
     address.write(addr)
@@ -27,7 +27,7 @@ def test_address_decode(addr, a, b, c, d):
 
 def test_bit_mux():
     network = core.Network()
-    lines = utils.BinaryIn(network, 3)
+    lines = test_utils.BinaryIn(network, 3)
     data_lines = [lines[0], lines[1]]
     address = [lines[2]]
     res = mux.bit_mux(address, *data_lines)
@@ -43,10 +43,10 @@ def test_bit_mux():
 
 def test_word_mux():
     network = core.Network()
-    inputs = [utils.BinaryIn(network, 2, value=3-i) for i in range(4)]
-    address = utils.BinaryIn(network, 2)
+    inputs = [test_utils.BinaryIn(network, 2, value=3-i) for i in range(4)]
+    address = test_utils.BinaryIn(network, 2)
     m = mux.word_mux(address, *inputs)
-    res = utils.BinaryOut(m)
+    res = test_utils.BinaryOut(m)
 
     for i in range(4):
         address.write(i)

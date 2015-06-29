@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 
 import random
 
-from gatesym import core, gates, utils
+from gatesym import core, gates, test_utils
 from gatesym.blocks import adders
 
 
@@ -105,10 +105,10 @@ def test_full_adder():
 
 def test_ripple_adder():
     network = core.Network()
-    a = utils.BinaryIn(network, 8)
-    b = utils.BinaryIn(network, 8)
+    a = test_utils.BinaryIn(network, 8)
+    b = test_utils.BinaryIn(network, 8)
     r, c = adders.ripple_adder(a, b)
-    r = utils.BinaryOut(r)
+    r = test_utils.BinaryOut(r)
 
     for i in range(10):
         v1 = random.randrange(256)

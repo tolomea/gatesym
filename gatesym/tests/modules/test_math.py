@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 
 import random
 
-from gatesym import core, gates, utils
+from gatesym import core, gates, test_utils
 from gatesym.modules import math
 
 
@@ -10,10 +10,10 @@ def test_adder_adding():
     network = core.Network()
     clock = gates.Tie(network)
     write_flag = gates.Tie(network)
-    address = utils.BinaryIn(network, 2)
-    data_in = utils.BinaryIn(network, 8)
+    address = test_utils.BinaryIn(network, 2)
+    data_in = test_utils.BinaryIn(network, 8)
     adder = math.add(clock, write_flag, address, data_in)
-    data_out = utils.BinaryOut(adder)
+    data_out = test_utils.BinaryOut(adder)
     network.drain()
 
     def write(value, addr):

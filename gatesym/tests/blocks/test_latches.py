@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 
 import random
 
-from gatesym import core, gates, utils
+from gatesym import core, gates, test_utils
 from gatesym.blocks import latches
 
 
@@ -71,9 +71,9 @@ def test_ms_d_flop_timing():
 def test_register():
     network = core.Network()
     clock = gates.Tie(network)
-    data = utils.BinaryIn(network, 8)
+    data = test_utils.BinaryIn(network, 8)
     register = latches.register(data, clock)
-    res = utils.BinaryOut(register)
+    res = test_utils.BinaryOut(register)
     network.drain()
 
     # clock a value through
