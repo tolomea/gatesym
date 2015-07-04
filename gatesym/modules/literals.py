@@ -4,18 +4,18 @@ from gatesym.gates import Tie, block
 
 
 @block
-def low_literal(clock, write, address, data_in):
+def low_literal(clock, write, address, data_in, size):
     data_out = []
-    data_out.extend(address)
-    for i in range(len(data_in) - len(address)):
+    data_out.extend(address[:size])
+    for i in range(len(data_in) - size):
         data_out.append(Tie(clock.network))
     return data_out
 
 
 @block
-def high_literal(clock, write, address, data_in):
+def high_literal(clock, write, address, data_in, size):
     data_out = []
-    for i in range(len(data_in) - len(address)):
+    for i in range(len(data_in) - size):
         data_out.append(Tie(clock.network))
-    data_out.extend(address)
+    data_out.extend(address[:size])
     return data_out

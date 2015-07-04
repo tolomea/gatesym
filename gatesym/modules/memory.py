@@ -7,7 +7,9 @@ from gatesym.utils import tie_word
 
 
 @block
-def memory(clock, write, address, data_in):
+def memory(clock, write, address, data_in, size):
+    address = address[:size]
+
     write_clock = And(clock, write)
 
     control_lines = address_decode(address)
@@ -20,7 +22,8 @@ def memory(clock, write, address, data_in):
 
 
 @block
-def rom(clock, write, address, data_in, data):
+def rom(clock, write, address, data_in, size, data):
+    address = address[:size]
     control_lines = address_decode(address)
     assert len(data) <= len(control_lines)
     network = clock.network

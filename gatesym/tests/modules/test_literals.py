@@ -11,8 +11,8 @@ def test_low_literal():
     clock = gates.Tie(network)
     write = gates.Tie(network)
     data_in = test_utils.BinaryIn(network, 8)
-    address = test_utils.BinaryIn(network, 4)
-    low_literal = literals.low_literal(clock, write, address, data_in)
+    address = test_utils.BinaryIn(network, 8)
+    low_literal = literals.low_literal(clock, write, address, data_in, 4)
     data_out = test_utils.BinaryOut(low_literal)
 
     # read a value
@@ -31,8 +31,8 @@ def test_high_literal():
     clock = gates.Tie(network)
     write = gates.Tie(network)
     data_in = test_utils.BinaryIn(network, 8)
-    address = test_utils.BinaryIn(network, 4)
-    low_literal = literals.high_literal(clock, write, address, data_in)
+    address = test_utils.BinaryIn(network, 8)
+    low_literal = literals.high_literal(clock, write, address, data_in, 4)
     data_out = test_utils.BinaryOut(low_literal)
 
     # read a value

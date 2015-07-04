@@ -9,7 +9,8 @@ from gatesym.blocks.mux import word_switch, address_decode
 
 @block
 def add(clock, write, address, data_in):
-    assert len(address) == 2
+    assert len(address) >= 2
+    address = address[:2]
 
     control_lines = address_decode(address)
 

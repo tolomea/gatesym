@@ -67,14 +67,17 @@ mov machine
         outputs to bus:
             data
 
-    Bus(clock, core_func, [(addr_prefix, module_func)]) -> None?
+    Bus(addr, write, [(addr_prefix, data_in)]) -> data_out, [write]
+        muxes write flag going out to modules and data going back to the core
         inputs from core:
-            addr
-            data
             write
-            clock
         outputs to core:
             data
+        inputs from modules:
+            data
+        outputs to modules:
+            write
+
 
     Core(clock, data_in)->(addr, data_out, write)
         registers: pc, addr, tmp

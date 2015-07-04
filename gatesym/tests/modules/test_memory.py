@@ -10,9 +10,9 @@ def test_memory():
     network = core.Network()
     clock = gates.Tie(network)
     write_flag = gates.Tie(network)
-    address = test_utils.BinaryIn(network, 4)
+    address = test_utils.BinaryIn(network, 8)
     data_in = test_utils.BinaryIn(network, 8)
-    mem = memory.memory(clock, write_flag, address, data_in)
+    mem = memory.memory(clock, write_flag, address, data_in, 4)
     data_out = test_utils.BinaryOut(mem)
     network.drain()
 
@@ -47,10 +47,10 @@ def test_rom():
     network = core.Network()
     clock = gates.Tie(network)
     write_flag = gates.Tie(network)
-    address = test_utils.BinaryIn(network, 4)
+    address = test_utils.BinaryIn(network, 8)
     data_in = test_utils.BinaryIn(network, 8)
     data = [random.randrange(256) for i in range(16)]
-    rom = memory.rom(clock, write_flag, address, data_in, data)
+    rom = memory.rom(clock, write_flag, address, data_in, 4, data)
     data_out = test_utils.BinaryOut(rom)
     network.drain()
 
