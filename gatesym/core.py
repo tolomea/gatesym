@@ -46,7 +46,6 @@ class Network(object):
     def write(self, gate_index, value):
         assert gate_index >= 0
         r_gate = self._gates[gate_index]
-        assert r_gate.type_ == TIE
         self._values[gate_index] = value
         self._queue.update(r_gate.outputs)
 

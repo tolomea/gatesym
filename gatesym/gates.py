@@ -46,7 +46,7 @@ class Gate(Node):
 
     def add_input(self, input_):
         input_.attach_output(self)
-        input_.connect_output(self)
+        input_.connect_output(self, False)
 
     def __repr__(self):
         return "{self.__class__.__name__}<{self.index}>({value})".format(self=self, value=self.read())
@@ -54,7 +54,7 @@ class Gate(Node):
     def read(self):
         return self.network.read(self.index)
 
-    def connect_output(self, output, negate=False):
+    def connect_output(self, output, negate):
         self.network.add_link(self.index, output.index, negate)
 
 
@@ -105,7 +105,7 @@ class Link(Node):
     def read(self):
         return self.gate.read()
 
-    def connect_output(self, output, negate=False):
+    def connect_output(self, output, negate):
         return self.gate.connect_output(output, negate)
 
 
@@ -113,15 +113,29 @@ class Not(Link):
     def __init__(self, gate):
         super(Not, self).__init__(gate, "not")
 
-    @property
-    def index(self):
-        return -self.gate.index
-
     def read(self):
         return not self.gate.read()
 
-    def connect_output(self, output, negate=False):
+    def connect_output(self, output, negate):
         return self.gate.connect_output(output, not negate)
+
+
+class Placeholder(Node):
+    """ a placeholder we will replace with a real node later """
+    def __init__(self, network):
+        super(Placeholder, self).__init__("placeholder")
+        self.network = network
+        self.connected = []
+
+    def connect_output(self, output, negate):
+        self.connected.append((output, negate))
+
+    def replace(self, input):
+        for o in self.outputs:
+            input.attach_output(o)
+        for o, n in self.connected:
+            input.connect_output(o, n)
+        return input
 
 
 def link_factory(obj, name):

@@ -1,17 +1,19 @@
 from __future__ import unicode_literals, division, absolute_import
 
-from gatesym.gates import And, Not, block, nand
+from gatesym.gates import Not, block, nand, Placeholder
 
 
 @block
 def gated_d_latch(data, clock):
     s = nand(data, clock)
     r = nand(s, clock)
-    q1 = And(s)
-    q2 = Not(q1)
-    nq = nand(q2, r)
-    q1.add_input(nq)
-    return q2
+    q = Placeholder(data.network)
+    not_q = nand(q, r)
+    q = q.replace(nand(not_q, s))
+
+    # force it to init as 0, this is writing the and part of the q nand
+    q.network.write(q.index, True)
+    return q
 
 
 @block
