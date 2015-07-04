@@ -1,20 +1,4 @@
-def bit_mux(address, bits):
-    pass
-
-
-def bit_demux(address, data):
-    pass
-
-
-def word_mux(address, words):
-    pass
-
-
-def word_demux(address, data_word):
-    pass
-
-
-""" muxes
+muxes
     mux n address, 2**n inputs
 
     flat address
@@ -47,102 +31,76 @@ def word_demux(address, data_word):
     or have a shared address into a 2 input And per bit
     with an Or across all the bits in the same position
     for demux we can leave out the or
-"""
-
-"""
-registers, accumulator, stack pointer, program counter
-push - accumulator to stack
-pop - stack to accumulator
-load - address in accumulator to accumulator
-store - need address and value :(
-
-add
-sub
-div
-mul
-rem
-lshift
-rshift
-invert
-and
-or
-
-if
-goto
-call
-return
-
-"""
 
 
 mov machine
-only instruction is address to address mov
-everything else is mapped into register space
-assume word size = address size = S
-main loop is 4 stage
-    1: read pc
-    2: read pc + 1
-    3: fetch
-    4: store
-bus
-    S address bits, only written by the core
-    S data bits, can be written by core or any module
-    clock line
-    r/w flag
-low literal module
-    2^(s/2) address range
-    address bits reflected back
-high literal module
-    2^(s/2) address range
-    address bits reflected back, shuffled by s/2
-math modules
-    4 address range
-    2 inputs
-    1-2 outputs
+    only instruction is address to address mov
+    everything else is mapped into register space
+    assume word size = address size = S
+    main loop is 4 stage
+        1: read pc
+        2: read pc + 1
+        3: fetch
+        4: store
+    bus
+        S address bits, only written by the core
+        S data bits, can be written by core or any module
+        clock line
+        r/w flag
+    low literal module
+        2^(s/2) address range
+        address bits reflected back
+    high literal module
+        2^(s/2) address range
+        address bits reflected back, shuffled by s/2
+    math modules
+        4 address range
+        2 inputs
+        1-2 outputs
 
-Module(clock, write, address, data_in)->data_out
-    inputs from bus:
-        addr
-        data
-        write
-        clock
-    outputs to bus:
-        data
+    Module(clock, write, address, data_in)->data_out
+        inputs from bus:
+            addr
+            data
+            write
+            clock
+        outputs to bus:
+            data
 
-Bus(clock, core_func, [(addr_prefix, module_func)]) -> None?
-    inputs from core:
-        addr
-        data
-        write
-        clock
-    outputs to core:
-        data
+    Bus(clock, core_func, [(addr_prefix, module_func)]) -> None?
+        inputs from core:
+            addr
+            data
+            write
+            clock
+        outputs to core:
+            data
 
-Core(clock, data_in)->(addr, data_out, write)
-    registers: pc, addr, tmp
-    4 stage
-    0:
-        pc -> bus addr
-        bus data -> addr
-    1:
-        addr -> bus addr
-        bus data -> tmp
-        incr pc
-    2:
-        pc -> bus addr
-        bus data -> addr
-    3:
-        addr -> bus addr
-        tmp -> bus data
-        true -> bus write
-        incr pc
+    Core(clock, data_in)->(addr, data_out, write)
+        registers: pc, addr, tmp
+        4 stage
+        0:
+            pc -> bus addr
+            bus data -> addr
+        1:
+            addr -> bus addr
+            bus data -> tmp
+            incr pc
+        2:
+            pc -> bus addr
+            bus data -> addr
+        3:
+            addr -> bus addr
+            tmp -> bus data
+            true -> bus write
+            incr pc
 
-    4 count incr -> address decode -> 3 -> bus write
-                                   -> 1 -> tmp write
-                 -> low bit -> pc write
-                            -> register switch (pc, addr) -> bus addr
-                            -> not -> addr write
-    bus data -> addr -> (see above)
-             -> tmp -> bus data
-    pc -> (see above)
-       -> incr -> pc
+        4 count incr -> address decode -> 3 -> bus write
+                                       -> 1 -> tmp write
+                     -> low bit -> pc write
+                                -> register switch (pc, addr) -> bus addr
+                                -> not -> addr write
+        bus data -> addr -> (see above)
+                 -> tmp -> bus data
+        pc -> (see above)
+           -> incr -> pc

@@ -4,14 +4,14 @@ from gatesym import core, gates
 from gatesym.blocks import adders
 
 
-def test_get():
+def test_find():
     n = core.Network()
     a = gates.Tie(n)
     b = gates.Tie(n)
     c = gates.Tie(n)
     r, co = adders.full_adder(a, b, c)
-    assert a.get("full_adder.half_adder.and.half_adder.or.full_adder") is co
-    assert a.get("full_adder.half_adder.not.and.or.half_adder.half_adder.not.and.or.half_adder.full_adder") is r
+    assert a.find("full_adder.half_adder.and.half_adder.or.full_adder") is co
+    assert a.find("full_adder.half_adder.not.and.or.half_adder.half_adder.not.and.or.half_adder.full_adder") is r
 
 
 def test_list():

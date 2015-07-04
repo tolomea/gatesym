@@ -1,5 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 
+""" the actual (and entire) simulation implementation """
+
 import collections
 
 
