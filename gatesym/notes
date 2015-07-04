@@ -100,3 +100,47 @@ math modules
     2 inputs
     1-2 outputs
 
+Module(clock, write, address, data_in)->data_out
+    inputs from bus:
+        addr
+        data
+        write
+        clock
+    outputs to bus:
+        data
+
+Bus(clock, core_func, [(addr_prefix, module_func)]) -> None?
+    inputs from core:
+        addr
+        data
+        write
+        clock
+    outputs to core:
+        data
+
+Core(clock, data_in)->(addr, data_out, write)
+    registers: pc, addr, tmp
+    4 stage
+    0:
+        pc -> bus addr
+        bus data -> addr
+    1:
+        addr -> bus addr
+        bus data -> tmp
+        incr pc
+    2:
+        pc -> bus addr
+        bus data -> addr
+    3:
+        addr -> bus addr
+        tmp -> bus data
+        true -> bus write
+        incr pc
+
+    4 count incr -> address decode -> 3 -> bus write
+                                   -> 1 -> tmp write
+                 -> low bit -> incr pc
+                            -> register switch (pc, addr) -> bus addr
+                            -> not -> addr write
+    bus data -> addr -> (see above)
+             -> tmp -> bus data

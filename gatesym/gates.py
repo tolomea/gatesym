@@ -46,7 +46,7 @@ class Gate(Link):
         self.network.add_link(input_, self)
 
     def __repr__(self):
-        return "{self.index}".format(self=self)
+        return "{self.__class__.__name__}<{self.index}>({value})".format(self=self, value=self.read())
 
     def read(self):
         return self.network.read(self)
@@ -54,6 +54,7 @@ class Gate(Link):
 
 class Tie(Gate):
     def __init__(self, network, value=False):
+        value = bool(value)
         index = network.add_gate(core.TIE)
         super(Tie, self).__init__(network, index, "tie")
         self.write(value)
@@ -107,8 +108,10 @@ class Proxy(Link):
 def proxy_factory(obj, name):
     if isinstance(obj, collections.Iterable):
         return [proxy_factory(o, name) for o in obj]
-    else:
+    elif isinstance(obj, Link):
         return Proxy(obj, name)
+    else:
+        return obj
 
 
 class Block(object):

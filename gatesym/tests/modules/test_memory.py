@@ -41,3 +41,25 @@ def test_memory():
 
         a = random.randrange(16)
         assert read(a) == data[a]
+
+
+def test_rom():
+    network = core.Network()
+    clock = gates.Tie(network)
+    write_flag = gates.Tie(network)
+    address = test_utils.BinaryIn(network, 4)
+    data_in = test_utils.BinaryIn(network, 8)
+    data = [random.randrange(256) for i in range(16)]
+    rom = memory.rom(clock, write_flag, address, data_in, data)
+    data_out = test_utils.BinaryOut(rom)
+    network.drain()
+
+    def read(addr):
+        address.write(addr)
+        write_flag.write(0)
+        network.drain()
+        return data_out.read()
+
+    for i in range(100):
+        a = random.randrange(16)
+        assert read(a) == data[a]
