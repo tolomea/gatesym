@@ -63,12 +63,6 @@ class Tie(Gate):
         self.network.write(self, value)
 
 
-def Not(gate):
-    res = Gate(gate.network, -gate.index, "not")
-    gate.attach(res)
-    return res
-
-
 class And(Gate):
     def __init__(self, *inputs):
         network = inputs[0].network
@@ -103,6 +97,18 @@ class Proxy(Link):
 
     def read(self):
         return self.gate.read()
+
+
+class Not(Proxy):
+    def __init__(self, gate):
+        super(Not, self).__init__(gate, "not")
+
+    @property
+    def index(self):
+        return -self.gate.index
+
+    def read(self):
+        return not self.gate.read()
 
 
 def proxy_factory(obj, name):

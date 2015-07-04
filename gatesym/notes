@@ -139,8 +139,10 @@ Core(clock, data_in)->(addr, data_out, write)
 
     4 count incr -> address decode -> 3 -> bus write
                                    -> 1 -> tmp write
-                 -> low bit -> incr pc
+                 -> low bit -> pc write
                             -> register switch (pc, addr) -> bus addr
                             -> not -> addr write
     bus data -> addr -> (see above)
              -> tmp -> bus data
+    pc -> (see above)
+       -> incr -> pc

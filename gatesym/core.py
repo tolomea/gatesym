@@ -82,3 +82,7 @@ class Network(object):
         while self.step():
             count += 1
         return count
+
+    def dump(self):
+        for i, (v, g) in enumerate(zip(self._values, self._gates)):
+            print i, v, g
