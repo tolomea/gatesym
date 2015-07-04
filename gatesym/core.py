@@ -14,8 +14,8 @@ class _Gate(collections.namedtuple("_Gate", "type_, inputs, neg_inputs, outputs"
 
 class Network(object):
     def __init__(self):
-        self._gates = [None]
-        self._values = [None]
+        self._gates = []
+        self._values = []
         self._queue = set()
 
     def add_gate(self, type_):
@@ -25,23 +25,24 @@ class Network(object):
         self._values.append(False)
         return index
 
-    def add_link(self, source_index, destination_index):
-        assert destination_index > 0
+    def add_link(self, source_index, destination_index, negate=False):
+        assert destination_index >= 0
+        assert source_index >= 0
         dest_gate = self._gates[destination_index]
         assert dest_gate.type_ != TIE
-        self._gates[abs(source_index)].outputs.add(destination_index)
-        if source_index < 0:
-            dest_gate.neg_inputs.add(abs(source_index))
+        self._gates[source_index].outputs.add(destination_index)
+        if negate:
+            dest_gate.neg_inputs.add(source_index)
         else:
             dest_gate.inputs.add(source_index)
         self._queue.add(destination_index)
 
     def read(self, gate_index):
-        assert gate_index > 0
+        assert gate_index >= 0
         return self._values[gate_index]
 
     def write(self, gate_index, value):
-        assert gate_index > 0
+        assert gate_index >= 0
         r_gate = self._gates[gate_index]
         assert r_gate.type_ == TIE
         self._values[gate_index] = value

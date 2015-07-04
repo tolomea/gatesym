@@ -12,7 +12,7 @@ class Link(object):
         self.name = name
         self.outputs = []
 
-    def attach(self, output):
+    def attach_output(self, output):
         self.outputs.append(output)
 
     def get(self, path):
@@ -42,14 +42,17 @@ class Gate(Link):
             self.add_input(input_)
 
     def add_input(self, input_):
-        input_.attach(self)
-        self.network.add_link(input_.index, self.index)
+        input_.attach_output(self)
+        input_.connect_output(self)
 
     def __repr__(self):
         return "{self.__class__.__name__}<{self.index}>({value})".format(self=self, value=self.read())
 
     def read(self):
         return self.network.read(self.index)
+
+    def connect_output(self, output, negate=False):
+        self.network.add_link(self.index, output.index, negate)
 
 
 class Tie(Gate):
@@ -85,7 +88,7 @@ class Proxy(Link):
     def __init__(self, gate, name):
         super(Proxy, self).__init__(name)
         self.gate = gate
-        gate.attach(self)
+        gate.attach_output(self)
 
     @property
     def network(self):
@@ -98,6 +101,9 @@ class Proxy(Link):
     def read(self):
         return self.gate.read()
 
+    def connect_output(self, output, negate=False):
+        return self.gate.connect_output(output, negate)
+
 
 class Not(Proxy):
     def __init__(self, gate):
@@ -109,6 +115,9 @@ class Not(Proxy):
 
     def read(self):
         return not self.gate.read()
+
+    def connect_output(self, output, negate=False):
+        return self.gate.connect_output(output, not negate)
 
 
 def proxy_factory(obj, name):
