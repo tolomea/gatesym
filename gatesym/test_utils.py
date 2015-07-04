@@ -13,6 +13,15 @@ class BinaryIn(object):
             tie.write(value % 2)
             value //= 2
 
+    def read(self):
+        res = 0
+        idx = 1
+        for tie in self.ties:
+            if tie.read():
+                res += idx
+            idx *= 2
+        return res
+
     def __iter__(self):
         return iter(self.ties)
 

@@ -34,6 +34,9 @@ def bit_mux(address, *data):
 
 @block
 def word_switch(control_lines, *data):
+    word_size = len(data[0])
+    assert all(len(d) == word_size for d in data)
+
     output = []
     for data_lines in zip(*data):
         output.append(bit_switch(control_lines, *data_lines))
