@@ -119,3 +119,23 @@ def test_ripple_adder():
         network.drain()
         assert c.read() == (v1 + v2 >= 256)
         assert r.read() == (v1 + v2) % 256
+
+
+def test_ripple_incr():
+    network = core.Network()
+    a = test_utils.BinaryIn(network, 8)
+    r, c = adders.ripple_incr(a)
+    r = test_utils.BinaryOut(r)
+
+    for i in range(10):
+        v = random.randrange(255)
+        print v
+        a.write(v)
+        network.drain()
+        assert c.read() == 0
+        assert r.read() == v + 1
+
+    a.write(255)
+    network.drain()
+    assert c.read() == 1
+    assert r.read() == 0

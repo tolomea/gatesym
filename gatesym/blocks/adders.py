@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 
-from gatesym.gates import And, Or, Not, block
+from gatesym.gates import And, Or, Not, block, Tie
 
 
 @block
@@ -24,5 +24,15 @@ def ripple_adder(aw, bw):
     rw = [r]
     for a, b in zip(aw, bw)[1:]:
         r, c = full_adder(a, b, c)
+        rw.append(r)
+    return rw, c
+
+
+@block
+def ripple_incr(word):
+    c = Tie(word[0].network, True)
+    rw = []
+    for a in word:
+        r, c = half_adder(a, c)
         rw.append(r)
     return rw, c
