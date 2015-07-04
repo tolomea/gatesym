@@ -4,17 +4,19 @@ from gatesym.gates import And, Or, Not, block
 
 
 @block
+def equals(value, lines):
+    matches = []
+    for j, line in enumerate(lines):
+        if value & 2**j:
+            matches.append(line)
+        else:
+            matches.append(Not(line))
+    return And(*matches)
+
+
+@block
 def address_decode(address):
-    control_lines = []
-    for i in range(2**len(address)):
-        addr_lines = []
-        for j, line in enumerate(address):
-            if i & 2**j:
-                addr_lines.append(line)
-            else:
-                addr_lines.append(Not(line))
-        control_lines.append(And(*addr_lines))
-    return control_lines
+    return [equals(i, address) for i in range(2**len(address))]
 
 
 @block
