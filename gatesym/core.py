@@ -25,32 +25,26 @@ class Network(object):
         self._values.append(False)
         return index
 
-    def add_link(self, source, destination):
-        assert source.network is self
-        assert destination.network is self
-        assert destination.index > 0
-        dest_gate = self._gates[destination.index]
+    def add_link(self, source_index, destination_index):
+        assert destination_index > 0
+        dest_gate = self._gates[destination_index]
         assert dest_gate.type_ != TIE
-        self._gates[abs(source.index)].outputs.add(destination.index)
-        if source.index < 0:
-            dest_gate.neg_inputs.add(abs(source.index))
+        self._gates[abs(source_index)].outputs.add(destination_index)
+        if source_index < 0:
+            dest_gate.neg_inputs.add(abs(source_index))
         else:
-            dest_gate.inputs.add(source.index)
-        self._queue.add(destination.index)
+            dest_gate.inputs.add(source_index)
+        self._queue.add(destination_index)
 
-    def read(self, gate):
-        assert gate.network is self
-        if gate.index < 0:
-            return not self._values[-gate.index]
-        else:
-            return self._values[gate.index]
+    def read(self, gate_index):
+        assert gate_index > 0
+        return self._values[gate_index]
 
-    def write(self, gate, value):
-        assert gate.network is self
-        assert gate.index > 0
-        r_gate = self._gates[gate.index]
+    def write(self, gate_index, value):
+        assert gate_index > 0
+        r_gate = self._gates[gate_index]
         assert r_gate.type_ == TIE
-        self._values[gate.index] = value
+        self._values[gate_index] = value
         self._queue.update(r_gate.outputs)
 
     def step(self):

@@ -43,13 +43,13 @@ class Gate(Link):
 
     def add_input(self, input_):
         input_.attach(self)
-        self.network.add_link(input_, self)
+        self.network.add_link(input_.index, self.index)
 
     def __repr__(self):
         return "{self.__class__.__name__}<{self.index}>({value})".format(self=self, value=self.read())
 
     def read(self):
-        return self.network.read(self)
+        return self.network.read(self.index)
 
 
 class Tie(Gate):
@@ -60,7 +60,7 @@ class Tie(Gate):
         self.write(value)
 
     def write(self, value):
-        self.network.write(self, value)
+        self.network.write(self.index, value)
 
 
 class And(Gate):
