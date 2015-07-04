@@ -71,6 +71,7 @@ class Tie(Gate):
 
 class And(Gate):
     def __init__(self, *inputs):
+        assert inputs
         network = inputs[0].network
         index = network.add_gate(core.AND)
         super(And, self).__init__(network, index, "and", inputs)
@@ -78,6 +79,7 @@ class And(Gate):
 
 class Or(Gate):
     def __init__(self, *inputs):
+        assert inputs
         network = inputs[0].network
         index = network.add_gate(core.OR)
         super(Or, self).__init__(network, index, "or", inputs)

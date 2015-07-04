@@ -3,7 +3,7 @@ from __future__ import unicode_literals, division, absolute_import
 from gatesym.gates import block, And
 from gatesym.blocks.latches import register
 from gatesym.blocks.mux import address_decode, word_switch
-from gatesym.utils import tie_register
+from gatesym.utils import tie_word
 
 
 @block
@@ -25,5 +25,5 @@ def rom(clock, write, address, data_in, data):
     assert len(data) <= len(control_lines)
     network = clock.network
     data_size = len(data_in)
-    ties = [tie_register(network, data_size, d) for d in data]
+    ties = [tie_word(network, data_size, d) for d in data]
     return word_switch(control_lines, *ties)
