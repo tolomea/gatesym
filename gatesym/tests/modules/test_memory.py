@@ -32,14 +32,14 @@ def test_memory():
         network.drain()
         return data_out.read()
 
-    data = [0] * 16
-    for i in range(100):
+    data = [0] * 8
+    for i in range(16):
         v = random.randrange(256)
-        a = random.randrange(16)
+        a = random.randrange(8)
         write(v, a)
         data[a] = v
 
-        a = random.randrange(16)
+        a = random.randrange(8)
         assert read(a) == data[a]
 
 

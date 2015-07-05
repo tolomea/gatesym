@@ -7,7 +7,7 @@ from gatesym import core
 from gatesym.test_utils import BinaryOut
 
 
-def computer(clock):
+def computer(clock, rom_content):
     word_size = 16
     network = clock.network
     data_in = PlaceholderWord(network, word_size)
@@ -16,13 +16,6 @@ def computer(clock):
 
     rom_write = Placeholder(network)
     rom_size = 8
-    rom_content = [
-        0x17a, 0x200,
-        0x105, 0x201,
-        0x202, 0x200,
-        0x143, 0x201,
-        0x202, 0x300,
-    ]
     rom_data = memory.rom(clock, rom_write, address, data_out, rom_size, rom_content)
 
     adder_write = Placeholder(network)
@@ -52,10 +45,28 @@ def computer(clock):
     return ram_write, ram_data
 
 
+ADD_A = 0x200
+ADD_B = 0x201
+ADD_R = 0x202
+PRINT = 0x300
+
+
+def LIT(x):
+    return 0x100 + x
+
+
 def main():
+    program = [
+        LIT(123), ADD_A,
+        LIT(5), ADD_B,
+        ADD_R, ADD_A,
+        LIT(67), ADD_B,
+        ADD_R, PRINT,
+    ]
+
     network = core.Network()
     clock = Tie(network)
-    write, res = computer(clock)
+    write, res = computer(clock, program)
     res = BinaryOut(res)
     network.drain()
 
