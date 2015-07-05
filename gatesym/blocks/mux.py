@@ -5,6 +5,7 @@ from gatesym.gates import And, Or, Not, block
 
 @block
 def equals(value, lines):
+    assert 2**len(lines) > value
     matches = []
     for j, line in enumerate(lines):
         if value & 2**j:
@@ -15,8 +16,10 @@ def equals(value, lines):
 
 
 @block
-def address_decode(address):
-    return [equals(i, address) for i in range(2**len(address))]
+def address_decode(address, limit=None):
+    if limit is None:
+        limit = 2**len(address)
+    return [equals(i, address) for i in range(limit)]
 
 
 @block

@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 
-from gatesym.gates import block, And
+from gatesym.gates import block, And, Tie
 from gatesym.blocks.latches import register
 from gatesym.blocks.mux import address_decode, word_switch
 from gatesym.utils import tie_word
@@ -12,7 +12,10 @@ def memory(clock, write, address, data_in, size):
 
     write_clock = And(clock, write)
 
-    control_lines = address_decode(address)
+    if size:
+        control_lines = address_decode(address)
+    else:
+        control_lines = [Tie(clock.network, True)]
 
     registers = []
     for line in control_lines:
@@ -24,7 +27,7 @@ def memory(clock, write, address, data_in, size):
 @block
 def rom(clock, write, address, data_in, size, data):
     address = address[:size]
-    control_lines = address_decode(address)
+    control_lines = address_decode(address, len(data))
     assert len(data) <= len(control_lines)
     network = clock.network
     data_size = len(data_in)
