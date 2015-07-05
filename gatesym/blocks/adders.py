@@ -40,8 +40,14 @@ def ripple_incr(word):
 
 @block
 def ripple_sum(*words):
-    res, carry = ripple_adder(words[0], words[1])
-    for word in words[2:]:
-        res, c = ripple_adder(res, word)
-        carry = Or(carry, c)
-    return res, carry
+    carries = []
+    while len(words) > 1:
+        new_words = []
+        for a, b in zip(words[::2], words[1::2]):
+            res, carry = ripple_adder(a, b)
+            carries.append(carry)
+            new_words.append(res)
+        if len(words) % 2:
+            new_words.append(words[-1])
+        words = new_words
+    return words[0], Or(*carries)

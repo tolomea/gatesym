@@ -3,7 +3,7 @@ from __future__ import unicode_literals, division, absolute_import
 from gatesym.gates import Placeholder, Tie
 from gatesym.utils import PlaceholderWord
 from gatesym.modules import bus, cpu_core, math, memory, literals
-from gatesym import core
+from gatesym import core, profiler
 from gatesym.test_utils import BinaryOut
 
 
@@ -67,6 +67,9 @@ def main():
     network = core.Network()
     clock = Tie(network)
     write, res = computer(clock, program)
+
+    print "size:", profiler.size(network)
+
     res = BinaryOut(res)
     network.drain()
 
