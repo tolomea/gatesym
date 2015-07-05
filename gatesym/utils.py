@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 
 import collections
 
-from gatesym.gates import Tie, Placeholder
+from gatesym.gates import Tie, Placeholder, Or
 
 
 def pad(word, length, value=False):
@@ -30,3 +30,13 @@ class PlaceholderWord(collections.Sequence):
 
     def replace(self, inputs):
         return [old.replace(new) for old, new in zip(self, inputs)]
+
+
+def shuffle_right(word, amount):
+    network = word[0].network
+    res = [Tie(network) for i in range(amount)] + word
+    if amount:
+        carry = Or(*res[len(word):])
+    else:
+        carry = Tie(network)
+    return res[:len(word)], carry

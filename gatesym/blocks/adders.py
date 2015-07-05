@@ -36,3 +36,12 @@ def ripple_incr(word):
         r, c = half_adder(a, c)
         rw.append(r)
     return rw, c
+
+
+@block
+def ripple_sum(*words):
+    res, carry = ripple_adder(words[0], words[1])
+    for word in words[2:]:
+        res, c = ripple_adder(res, word)
+        carry = Or(carry, c)
+    return res, carry

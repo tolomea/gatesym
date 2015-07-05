@@ -139,3 +139,21 @@ def test_ripple_incr():
     network.drain()
     assert c.read() == 1
     assert r.read() == 0
+
+
+def test_ripple_sum():
+    count = random.randrange(2, 10)
+
+    network = core.Network()
+    inputs = [test_utils.BinaryIn(network, 8) for i in range(count)]
+    res, carry = adders.ripple_sum(*inputs)
+    res = test_utils.BinaryOut(res)
+
+    for i in range(10):
+        values = [random.randrange(512 // count) for i in range(count)]
+        print values
+        for i, v in zip(inputs, values):
+            i.write(v)
+        network.drain()
+        assert carry.read() == (sum(values) >= 256)
+        assert res.read() == (sum(values) % 256)
