@@ -91,35 +91,31 @@ def nand(*inputs):
 
 class Link(Node):
     """ interesting steps along the path between two gates """
-    def __init__(self, gate, name):
+    def __init__(self, node, name):
         super(Link, self).__init__(name)
-        self.gate = gate
-        gate.attach_output(self)
+        self.node = node
+        node.attach_output(self)
 
     @property
     def network(self):
-        return self.gate.network
-
-    @property
-    def index(self):
-        return self.gate.index
+        return self.node.network
 
     def read(self):
-        return self.gate.read()
+        return self.node.read()
 
     def connect_output(self, output, negate):
-        return self.gate.connect_output(output, negate)
+        return self.node.connect_output(output, negate)
 
 
 class Not(Link):
-    def __init__(self, gate):
-        super(Not, self).__init__(gate, "not")
+    def __init__(self, node):
+        super(Not, self).__init__(node, "not")
 
     def read(self):
-        return not self.gate.read()
+        return not self.node.read()
 
     def connect_output(self, output, negate):
-        return self.gate.connect_output(output, not negate)
+        return self.node.connect_output(output, not negate)
 
 
 class Placeholder(Node):
