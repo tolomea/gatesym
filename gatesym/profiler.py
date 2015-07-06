@@ -1,10 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
 
 from gatesym import gates
+from gatesym import core
 
 
 def size(network):
-    return len(network._gates)
+    return sum(1 for g in network._gates if g.type_ != core.TIE)
 
 
 def _longest_gate_path(network, cache, index):
