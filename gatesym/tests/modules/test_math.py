@@ -41,22 +41,6 @@ def test_adder_adding():
         write(v2, 1)
         assert read(1) == v2
 
-        print v1, v2
-
-        res = read(2)
-        assert res == (v1 + v2) % 256
-        res = read(3)
-        assert res == (v1 + v2) // 256
-
-        # and another
-        v1 = random.randrange(256)
-        write(v1, 0)
-        assert read(0) == v1
-
-        v2 = random.randrange(256)
-        write(v2, 1)
-        assert read(1) == v2
-
         res = read(2)
         assert res == (v1 + v2) % 256
         res = read(3)

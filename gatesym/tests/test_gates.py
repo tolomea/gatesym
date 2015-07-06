@@ -10,8 +10,8 @@ def test_find():
     b = gates.Tie(n)
     c = gates.Tie(n)
     r, co = adders.full_adder(a, b, c)
-    assert a.find("full_adder.half_adder.and.half_adder.or.full_adder") is co
-    assert a.find("full_adder.half_adder.not.and.or.half_adder.half_adder.not.and.or.half_adder.full_adder") is r
+    assert a.find("full_adder(0.half_adder(0.and.1).or.1)") is co
+    assert a.find("full_adder(0.half_adder(0.not.and.or.0).half_adder(0.not.and.or.0).0)") is r
 
 
 def test_list():
@@ -20,10 +20,10 @@ def test_list():
     b = gates.Tie(n)
     c = gates.Tie(n)
     r, co = adders.full_adder(a, b, c)
-    assert a.list("") == ["full_adder"]
-    assert a.list("full_adder") == ["half_adder"]
-    assert a.list("full_adder.half_adder") == ["and", "and", "not"]
-    assert a.list("full_adder.half_adder.and") == ["half_adder"]
-    assert a.list("full_adder.half_adder.and.half_adder") == ["or"]
-    assert a.list("full_adder.half_adder.and.half_adder.or") == ["full_adder"]
-    assert a.list("full_adder.half_adder.and.half_adder.or.full_adder") == []
+    assert a.list("") == ["full_adder(0"]
+    assert a.list("full_adder(0") == ["half_adder(0"]
+    assert a.list("full_adder(0.half_adder(0") == ["and", "and", "not"]
+    assert a.list("full_adder(0.half_adder(0.and") == ["1)"]
+    assert a.list("full_adder(0.half_adder(0.and.1)") == ["or"]
+    assert a.list("full_adder(0.half_adder(0.and.1).or") == ["1)"]
+    assert a.list("full_adder(0.half_adder(0.and.1).or.1)") == []

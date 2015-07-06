@@ -1,9 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
 
+import collections
+
 from gatesym.gates import Tie
 
 
-class BinaryIn(object):
+class BinaryIn(collections.Sequence):
     def __init__(self, network, size, value=0):
         self.ties = [Tie(network) for i in range(size)]
         self.write(value)

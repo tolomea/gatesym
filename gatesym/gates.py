@@ -18,16 +18,19 @@ class Node(object):
     def attach_output(self, output):
         self.outputs.append(output)
 
-    def find(self, path):
+    def find(self, path, location=""):
+        if location:
+            location = location + "."
+        location = location + self.name
         parts = path.split(".", 1)
         head = parts[0]
         tail = parts[1] if len(parts) > 1 else ""
         if head:
             for l in self.outputs:
                 if l.name == head:
-                    return l.find(tail)
+                    return l.find(tail, location)
             else:
-                assert False
+                raise ValueError("at " + location + " expected one of " + repr([o.name for o in self.outputs]))
         else:
             return self
 
@@ -136,32 +139,33 @@ class Placeholder(Node):
         return input
 
 
-def link_factory(obj, name):
+def link_factory(obj, name1, name2):
     """ wrap links around a bunch of nodes in an arbitrarily nested structure """
     if isinstance(obj, collections.Iterable):
-        return [link_factory(o, name) for o in obj]
+        if name1 and not name1.endswith("("):
+            name1 = name1 + ","
+        return [link_factory(o, name1 + str(i), name2) for i, o in enumerate(obj)]
     elif isinstance(obj, Node):
-        return Link(obj, name)
+        return Link(obj, name1 + name2)
     else:
         return obj
 
 
 class Block(object):
     """ wrapper around a functional block """
-    def __init__(self, name, inputs, args, outputs):
+    def __init__(self, name, inputs, outputs):
         self.name = name
         self.inputs = inputs
-        self.args = args
         if not isinstance(outputs, collections.Iterable):
             outputs = [outputs]
         self.outputs = outputs
 
 
-def _block(func, *args, **kwargs):
-    args = link_factory(args, func.__name__)
-    res = func(*args, **kwargs)
-    res = link_factory(res, func.__name__)
-    Block(func.__name__, args, kwargs, res)
+def _block(func, *args):
+    args = link_factory(args, func.__name__ + "(", "")
+    res = func(*args)
+    res = link_factory(res, "", ")")
+    Block(func.__name__, args, res)
     return res
 
 
