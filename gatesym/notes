@@ -107,3 +107,60 @@ mov machine
                  -> tmp -> bus data
         pc -> (see above)
            -> incr -> pc
+
+        pointers, we will add 0.5 and 2.5 steps which indirect addr if it's higest bit is set
+
+    Branching...
+        we can expose pc on the bus
+        jmp is just moving an address to pc
+        a literal scheme that works with pc offsets might be nice
+        conditional jumps could be 2 registers
+            one for the target and one for the condition
+            when condition is written if condition matches then we copy target to pc
+            we could have multiple condition registers for different conditional checks
+
+primes
+
+while True
+    i = 2
+    for j=2; j<sqrt(i); i++:
+        if i%j == 0:
+            break
+    else:
+        print i
+    i++
+
+
+   +-----------------------------+
+   |                             |
+ +-----------------------------+ <--+
+ | |                           | |  |
+ | |         MODULES           <----+
+ | |                           | |  |
+ | +--^-----^-------^------------+  |
+ |    |     |       |     |    |    |
+ +------^-----^-------^--------+    |
+      | |   | |     | |   | |       |
+      +-+   +-+     |W|   |D|       |
+      |     |       |R|   |A|       |
+      |     |       |I|   |T|       |
+      |     |       |T|   |A|       |
+      |     |       |E|   | |       |
+      |    A|       | |   | |       |
+     D|    D|    +--------v-v--+    |
+     A|    D|    |             |    |
+     T|    R+---->     BUS     <----+
+     A|    E|    |             |    |
+      |    S|    +---^---------+    |
+      |    S|        |     |        |
+      |     |       W|    D|    +-------+
+      |     |       R|    A|    |       |
+      |     |       I|    T|    | CLOCK |
+      |     |       T|    A|    |       |
+      |     |       E|     |    +-------+
+      |     |        |     |        |
+    +----------------------v--+     |
+    |                         |     |
+    |          CORE           <-----+
+    |                         |
+    +-------------------------+
