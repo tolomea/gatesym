@@ -45,6 +45,9 @@ class Node(object):
     def list(self, path):
         return [o.name for o in self.find(path).all_outputs]
 
+    def watch(self, name):
+        self.network.watch(self.index, name)
+
 
 class Gate(Node):
     """ handles to gates in the core """
@@ -116,6 +119,10 @@ class Link(Node):
 
     def connect_output(self, output, negate):
         return self.node.connect_output(output, negate)
+
+    @property
+    def index(self):
+        return self.node.index
 
 
 class Not(Link):
