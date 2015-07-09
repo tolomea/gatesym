@@ -103,10 +103,23 @@ def loop():
     ]
 
 
+def fib():
+    return [
+        LIT(0), ADD_A,
+        LIT(1), ADD_B,
+        LIT(1), PRINT,
+        ADD_R, PRINT,
+        ADD_R, ADD_A,
+        ADD_R, PRINT,
+        ADD_R, ADD_B,
+        LIT(6), JUMP,
+    ]
+
+
 def main():
     network = core.Network()
     clock = Tie(network)
-    write, res = computer(clock, loop())
+    write, res = computer(clock, fib())
 
     print "size:", profiler.size(network)
 
