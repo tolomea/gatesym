@@ -22,8 +22,12 @@ def computer(clock, rom_content):
     rom_data = memory.rom(clock, rom_write, address, data_out, rom_size, rom_content)
 
     # add
-    adder_write = Placeholder(network)
-    adder_data = math.add(clock, adder_write, address, data_out)
+    add_write = Placeholder(network)
+    add_data = math.add(clock, add_write, address, data_out)
+
+    # sub
+    sub_write = Placeholder(network)
+    sub_data = math.sub(clock, sub_write, address, data_out)
 
     # lit
     low_literal_write = Placeholder(network)
@@ -47,7 +51,8 @@ def computer(clock, rom_content):
         (ROM_BASE, word_size // 2, rom_data),
         (LIT_BASE, word_size // 2, low_literal_data),
         (RAM_BASE, word_size // 2, ram_data),
-        (ADD_BASE, 2, adder_data),
+        (ADD_BASE, 2, add_data),
+        (SUB_BASE, 2, sub_data),
         (PRINT_BASE, 0, print_data),
         (JUMP_BASE, 0, jump_data),
     ]
@@ -58,9 +63,10 @@ def computer(clock, rom_content):
     rom_write.replace(write_lines[0])
     low_literal_write.replace(write_lines[1])
     ram_write.replace(write_lines[2])
-    adder_write.replace(write_lines[3])
-    print_write.replace(write_lines[4])
-    jump_write.replace(write_lines[5])
+    add_write.replace(write_lines[3])
+    sub_write.replace(write_lines[4])
+    print_write.replace(write_lines[5])
+    jump_write.replace(write_lines[6])
 
     return print_write, print_data
 
@@ -69,8 +75,9 @@ ROM_BASE = 0x000
 LIT_BASE = 0x100
 RAM_BASE = 0x200
 ADD_BASE = 0x300
-JUMP_BASE = 0x304
-PRINT_BASE = 0x305
+SUB_BASE = 0x304
+JUMP_BASE = 0x308
+PRINT_BASE = 0x309
 
 ADD_A = ADD_BASE
 ADD_B = ADD_BASE + 1

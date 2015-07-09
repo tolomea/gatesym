@@ -157,3 +157,21 @@ def test_ripple_sum():
         network.drain()
         assert carry.read() == (sum(values) >= 256)
         assert res.read() == (sum(values) % 256)
+
+
+def test_ripple_subtractor():
+    network = core.Network()
+    a = test_utils.BinaryIn(network, 8)
+    b = test_utils.BinaryIn(network, 8)
+    r, c = adders.ripple_subtractor(a, b)
+    r = test_utils.BinaryOut(r)
+
+    for i in range(10):
+        v1 = random.randrange(256)
+        v2 = random.randrange(256)
+        print v1, v2
+        a.write(v1)
+        b.write(v2)
+        network.drain()
+        assert c.read() == (v1 < v2)
+        assert r.read() == (v1 - v2) % 256
