@@ -40,8 +40,8 @@ def computer(clock, rom_content):
     # jump
     jump_write = Placeholder(network)
     jump_data, _pc_in, _pc_write = jump.jump(clock, jump_write, address, data_out)
-    pc_in = pc_in.replace(_pc_in)
-    pc_write = pc_write.replace(_pc_write)
+    pc_in.replace(_pc_in)
+    pc_write.replace(_pc_write)
 
     modules = [
         (ROM_BASE, word_size // 2, rom_data),
@@ -54,13 +54,13 @@ def computer(clock, rom_content):
 
     data_from_bus, write_lines = bus.bus(address, write_out, modules)
 
-    data_in = data_in.replace(data_from_bus)
-    rom_write = rom_write.replace(write_lines[0])
-    low_literal_write = low_literal_write.replace(write_lines[1])
-    ram_write = ram_write.replace(write_lines[2])
-    adder_write = adder_write.replace(write_lines[3])
-    print_write = print_write.replace(write_lines[4])
-    jump_write = jump_write.replace(write_lines[5])
+    data_in.replace(data_from_bus)
+    rom_write.replace(write_lines[0])
+    low_literal_write.replace(write_lines[1])
+    ram_write.replace(write_lines[2])
+    adder_write.replace(write_lines[3])
+    print_write.replace(write_lines[4])
+    jump_write.replace(write_lines[5])
 
     return print_write, print_data
 

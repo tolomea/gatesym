@@ -142,16 +142,24 @@ class Placeholder(Node):
         super(Placeholder, self).__init__("placeholder")
         self.network = network
         self.connected = []
+        self.actual = None
 
     def connect_output(self, output, negate):
-        self.connected.append((output, negate))
+        if self.actual:
+            self.actual.connect_output(output, negate)
+        else:
+            self.connected.append((output, negate))
 
     def replace(self, input):
+        self.actual = input
         for o in self.outputs:
             input.attach_output(o)
         for o, n in self.connected:
             input.connect_output(o, n)
-        return input
+
+    def __getattr__(self, name):
+        assert self.actual
+        return getattr(self.actual, name)
 
 
 def link_factory(obj, name1, name2, in_block=None, out_block=None):

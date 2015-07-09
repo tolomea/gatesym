@@ -29,7 +29,8 @@ class PlaceholderWord(collections.Sequence):
         return self.placeholders[index]
 
     def replace(self, inputs):
-        return [old.replace(new) for old, new in zip(self, inputs)]
+        for old, new in zip(self, inputs):
+            old.replace(new)
 
 
 def shuffle_right(word, amount):

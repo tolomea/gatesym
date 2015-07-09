@@ -15,7 +15,7 @@ def cpu_core(clock, data_in, pc_in, write_pc, debug=False):
     # step through the 4 states in order
     state = PlaceholderWord(network, 2)
     incr, c = ripple_incr(state)
-    state = state.replace(register(incr, clock))
+    state.replace(register(incr, clock))
     s0, s1, s2, s3 = address_decode(state)
 
     # pc increments in s1 and s3, incoming pc writes are taken in s3
@@ -24,7 +24,7 @@ def cpu_core(clock, data_in, pc_in, write_pc, debug=False):
     jumping = And(write_pc, s3)
     new_pc = word_mux([jumping], incr, pc_in)
     clock_pc = And(clock, Or(s1, s3))
-    pc = pc.replace(register(new_pc, clock_pc))
+    pc.replace(register(new_pc, clock_pc))
 
     # clock in address in s0 and s2
     addr = register(data_in, And(clock, Or(s0, s2)))
