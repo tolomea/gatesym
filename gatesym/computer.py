@@ -104,16 +104,36 @@ def loop():
 
 
 def fib():
-    return [
+    return assemble([
         LIT(0), ADD_A,
         LIT(1), ADD_B,
         LIT(1), PRINT,
+        "loop:",
         ADD_R, PRINT,
         ADD_R, ADD_A,
         ADD_R, PRINT,
         ADD_R, ADD_B,
-        LIT(6), JUMP,
-    ]
+        "loop", JUMP,
+    ])
+
+
+def assemble(code):
+    labels = {}
+    i = 0
+    for c in code:
+        if isinstance(c, basestring) and c.endswith(":"):
+            labels[c[:-1]] = i
+        else:
+            i += 1
+
+    res = []
+    for c in code:
+        if isinstance(c, basestring):
+            if not c.endswith(":"):
+                res.append(LIT_BASE + labels[c])
+        else:
+            res.append(c)
+    return res
 
 
 def main():

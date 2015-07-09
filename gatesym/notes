@@ -121,14 +121,99 @@ mov machine
 
 primes
 
+
+i = 2
 while True
-    i = 2
-    for j=2; j<sqrt(i); i++:
+    for j=2; j<sqrt(i); j++:
         if i%j == 0:
             break
     else:
         print i
     i++
+
+
+i = 2
+start:
+    j = 2
+    loop_start:
+    if not j<sqrt(i) goto loop_else
+        if i%j == 0:
+            goto loop_end
+        j++
+        goto loop_start
+    loop_else:
+        print i
+    loop_end:
+    i++
+goto start
+
+
+    LIT(2), i
+start:
+    LIT(2), j
+loop_start:
+    i, SUB_A
+    j, SUB_B
+    loop_else, JUMP_DEST
+    SUB_R, JUMP_ZER)
+
+    i, DIV_A
+    j, DIV_B
+    loop_end, JUMP_DEST
+    DIV_M, JUMP_ZERO
+
+    LIT(1), ADD_A
+    j, ADD_A
+    ADD_R, j
+
+    loop_start, JUMP
+loop_else:
+    i, PRINT
+loop_end:
+    LIT(1), ADD_A
+    i, ADD_A
+    ADD_R, i
+
+    start, JUMP
+
+
+
+    LIT(2), i
+start:
+    LIT(2), j
+loop_start:
+    i, SUB_A
+    j, SUB_B
+    loop_else, JUMP_DEST
+    SUB_R, JUMP_ZERO
+
+    i, DIV_A
+    j, DIV_B
+    loop_end, JUMP_DEST
+    DIV_M, JUMP_ZERO
+
+    i, SUB_A
+    j, SUB_B
+mod_loop:
+    SUB_R, SUB_A
+    loop_end, JUMP_DEST
+    SUB_R, JUMP_ZERO
+    mod_loop, JUMP_DEST
+    SUB_C, JUMP_ZERO
+
+    LIT(1), ADD_A
+    j, ADD_A
+    ADD_R, j
+
+    loop_start, JUMP
+loop_else:
+    i, PRINT
+loop_end:
+    LIT(1), ADD_A
+    i, ADD_A
+    ADD_R, i
+
+    start, JUMP
 
 
    +-----------------------------+
