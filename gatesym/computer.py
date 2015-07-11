@@ -109,11 +109,13 @@ def basic_add():
 
 
 def loop():
+    i = RAM_BASE
     return [
         LIT(1), ADD_B,
         ADD_R, ADD_A,
-        PRINT, ADD_B,
-        ADD_R, PRINT,
+        i, ADD_B,
+        ADD_R, i,
+        i, PRINT,
         LIT(0), JUMP,
     ]
 
