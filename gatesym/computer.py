@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 
-from gatesym.gates import Placeholder, Tie
+from gatesym.gates import Placeholder, Switch
 from gatesym.utils import PlaceholderWord
 from gatesym.modules import bus, cpu_core, math, memory, literals, jump
 from gatesym import core, profiler
@@ -138,7 +138,6 @@ def primes():
     i = RAM_BASE
     j = RAM_BASE + 1
     tmp = RAM_BASE + 2
-    print "XXX", i, j,
 
     return assemble([
         LIT(3), i,
@@ -197,7 +196,7 @@ def assemble(code):
 
 def main():
     network = core.Network()
-    clock = Tie(network)
+    clock = Switch(network)
     write, res = computer(clock, primes())
 
     print "size:", profiler.size(network)

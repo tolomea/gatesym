@@ -8,8 +8,8 @@ from gatesym.modules import math
 
 def test_adder_adding():
     network = core.Network()
-    clock = gates.Tie(network)
-    write_flag = gates.Tie(network)
+    clock = gates.Switch(network)
+    write_flag = gates.Switch(network)
     address = test_utils.BinaryIn(network, 2)
     data_in = test_utils.BinaryIn(network, 8)
     adder = math.add(clock, write_flag, address, data_in)
@@ -49,8 +49,8 @@ def test_adder_adding():
 
 def test_adder_subtracting():
     network = core.Network()
-    clock = gates.Tie(network)
-    write_flag = gates.Tie(network)
+    clock = gates.Switch(network)
+    write_flag = gates.Switch(network)
     address = test_utils.BinaryIn(network, 2)
     data_in = test_utils.BinaryIn(network, 8)
     subtractor = math.sub(clock, write_flag, address, data_in)

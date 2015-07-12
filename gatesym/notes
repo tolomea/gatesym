@@ -153,3 +153,21 @@ mov machine
     |          CORE           <-----+
     |                         |
     +-------------------------+
+
+
+optimizing
+    no outputs delete
+    no inputs replace with tie
+    negative tie into and replaces
+    drop positive tie into and
+    one input add or or passes through
+    positive tie into or replaces
+    drop negative tie into or
+    same inputs merge
+new core operations
+    need to split ties into ties and switches
+    delete
+    merge
+    remove link
+
+

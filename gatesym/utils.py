@@ -35,9 +35,9 @@ class PlaceholderWord(collections.Sequence):
 
 def shuffle_right(word, amount):
     network = word[0].network
-    res = [Tie(network) for i in range(amount)] + word
+    res = [Tie(network, False) for i in range(amount)] + word
     if amount:
         carry = Or(*res[len(word):])
     else:
-        carry = Tie(network)
+        carry = Tie(network, False)
     return res[:len(word)], carry

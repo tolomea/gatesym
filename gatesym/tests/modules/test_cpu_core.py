@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 
 from gatesym.core import Network
-from gatesym.gates import Tie, Placeholder, And
+from gatesym.gates import Switch, Placeholder, And
 from gatesym.test_utils import BinaryIn, BinaryOut
 from gatesym.modules.cpu_core import cpu_core
 from gatesym.utils import PlaceholderWord
@@ -10,9 +10,9 @@ from gatesym.blocks import mux
 
 def test_basic():
     network = Network()
-    clock = Tie(network)
+    clock = Switch(network)
     data_in = BinaryIn(network, 8)
-    write_pc = Tie(network)
+    write_pc = Switch(network)
     pc_in = BinaryIn(network, 8)
 
     def step():
@@ -78,10 +78,10 @@ def test_basic():
 def test_jmp():
     """ twiddle the bits manually """
     network = Network()
-    clock = Tie(network)
+    clock = Switch(network)
     data_in = BinaryIn(network, 8)
     pc_in = BinaryIn(network, 8)
-    write_pc = Tie(network)
+    write_pc = Switch(network)
 
     def step():
         network.drain()
@@ -150,7 +150,7 @@ def test_jmp():
 def test_jmp2():
     """ same deal as above but with automatic signals so more realistic timing """
     network = Network()
-    clock = Tie(network)
+    clock = Switch(network)
     data_in = BinaryIn(network, 8)
     pc_in = PlaceholderWord(network, 8)
     write_pc = Placeholder(network)

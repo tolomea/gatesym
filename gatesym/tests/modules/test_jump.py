@@ -6,8 +6,8 @@ from gatesym.modules import jump
 
 def test_jump():
     network = core.Network()
-    clock = gates.Tie(network)
-    write_flag = gates.Tie(network)
+    clock = gates.Switch(network)
+    write_flag = gates.Switch(network)
     address = test_utils.BinaryIn(network, 2)
     data_in = test_utils.BinaryIn(network, 8)
     jump_out, pc_in, pc_write = jump.jump(clock, write_flag, address, data_in)
@@ -32,8 +32,8 @@ def test_jump():
 
 def test_jump_zero():
     network = core.Network()
-    clock = gates.Tie(network)
-    write_flag = gates.Tie(network)
+    clock = gates.Switch(network)
+    write_flag = gates.Switch(network)
     address = test_utils.BinaryIn(network, 2)
     data_in = test_utils.BinaryIn(network, 8)
     jump_out, pc_in, pc_write = jump.jump(clock, write_flag, address, data_in)
@@ -69,8 +69,8 @@ def test_jump_zero():
 
 def test_no_jump_non_zero():
     network = core.Network()
-    clock = gates.Tie(network)
-    write_flag = gates.Tie(network)
+    clock = gates.Switch(network)
+    write_flag = gates.Switch(network)
     address = test_utils.BinaryIn(network, 2)
     data_in = test_utils.BinaryIn(network, 8)
     jump_out, pc_in, pc_write = jump.jump(clock, write_flag, address, data_in)

@@ -8,8 +8,8 @@ from gatesym.blocks import latches
 
 def test_gated_d_latch():
     network = core.Network()
-    clock = gates.Tie(network)
-    data = gates.Tie(network)
+    clock = gates.Switch(network)
+    data = gates.Switch(network)
     latch = latches.gated_d_latch(data, clock)
     network.drain()
     assert not latch.read()
@@ -29,8 +29,8 @@ def test_gated_d_latch():
 
 def test_ms_d_flop_basic():
     network = core.Network()
-    clock = gates.Tie(network)
-    data = gates.Tie(network)
+    clock = gates.Switch(network)
+    data = gates.Switch(network)
     flop = latches.ms_d_flop(data, clock)
     network.drain()
     assert not flop.read()
@@ -60,8 +60,8 @@ def test_ms_d_flop_basic():
 
 def test_ms_d_flop_timing():
     network = core.Network()
-    clock = gates.Tie(network)
-    data = gates.Tie(network)
+    clock = gates.Switch(network)
+    data = gates.Switch(network)
     flop = latches.ms_d_flop(data, clock)
     network.drain()
     assert not flop.read()
@@ -93,7 +93,7 @@ def test_ms_d_flop_timing():
 
 def test_register():
     network = core.Network()
-    clock = gates.Tie(network)
+    clock = gates.Switch(network)
     data = test_utils.BinaryIn(network, 8)
     register = latches.register(data, clock)
     res = test_utils.BinaryOut(register)

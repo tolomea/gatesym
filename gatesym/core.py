@@ -5,7 +5,7 @@ from __future__ import unicode_literals, division, absolute_import
 import collections
 
 
-TIE, AND, OR = range(3)
+TIE, SWITCH, AND, OR = range(4)
 
 
 class _Gate(collections.namedtuple("_Gate", "type_, inputs, neg_inputs, outputs")):
@@ -23,7 +23,7 @@ class Network(object):
         self.log = []
 
     def add_gate(self, type_):
-        assert type_ in [TIE, AND, OR]
+        assert type_ in [TIE, SWITCH, AND, OR]
         index = len(self._gates)
         self._gates.append(_Gate(type_))
         self._values.append(False)
@@ -33,7 +33,7 @@ class Network(object):
         assert destination_index >= 0
         assert source_index >= 0
         dest_gate = self._gates[destination_index]
-        assert dest_gate.type_ != TIE
+        assert dest_gate.type_ not in {TIE, SWITCH}
         self._gates[source_index].outputs.add(destination_index)
         if negate:
             dest_gate.neg_inputs.add(source_index)

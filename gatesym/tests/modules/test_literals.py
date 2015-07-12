@@ -8,8 +8,8 @@ from gatesym.modules import literals
 
 def test_low_literal():
     network = core.Network()
-    clock = gates.Tie(network)
-    write = gates.Tie(network)
+    clock = gates.Switch(network)
+    write = gates.Switch(network)
     data_in = test_utils.BinaryIn(network, 8)
     address = test_utils.BinaryIn(network, 8)
     low_literal = literals.low_literal(clock, write, address, data_in, 4)
@@ -28,8 +28,8 @@ def test_low_literal():
 
 def test_high_literal():
     network = core.Network()
-    clock = gates.Tie(network)
-    write = gates.Tie(network)
+    clock = gates.Switch(network)
+    write = gates.Switch(network)
     data_in = test_utils.BinaryIn(network, 8)
     address = test_utils.BinaryIn(network, 8)
     low_literal = literals.high_literal(clock, write, address, data_in, 4)

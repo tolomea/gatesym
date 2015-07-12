@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 
 from gatesym.core import Network
-from gatesym.gates import Tie
+from gatesym.gates import Switch
 from gatesym.test_utils import BinaryIn, BinaryOut
 from gatesym.modules.bus import bus
 
@@ -9,7 +9,7 @@ from gatesym.modules.bus import bus
 def test_basic():
     network = Network()
     address = BinaryIn(network, 8)
-    write = Tie(network)
+    write = Switch(network)
     m1_data = BinaryIn(network, 8, 100)
     m2_data = BinaryIn(network, 8, 200)
     modules = [

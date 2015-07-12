@@ -5,7 +5,7 @@ from gatesym import core
 
 
 def size(network):
-    return sum(1 for g in network._gates if g.type_ != core.TIE)
+    return sum(1 for g in network._gates if g.type_ not in {core.TIE, core.SWITCH})
 
 
 def _longest_gate_path(network, cache, index):

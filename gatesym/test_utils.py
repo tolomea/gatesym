@@ -2,36 +2,36 @@ from __future__ import unicode_literals, division, absolute_import
 
 import collections
 
-from gatesym.gates import Tie
+from gatesym.gates import Switch
 
 
 class BinaryIn(collections.Sequence):
     def __init__(self, network, size, value=0):
-        self.ties = [Tie(network) for i in range(size)]
+        self.switches = [Switch(network) for i in range(size)]
         self.write(value)
 
     def write(self, value):
-        for tie in self.ties:
-            tie.write(value % 2)
+        for switch in self.switches:
+            switch.write(value % 2)
             value //= 2
 
     def read(self):
         res = 0
         idx = 1
-        for tie in self.ties:
-            if tie.read():
+        for switch in self.switches:
+            if switch.read():
                 res += idx
             idx *= 2
         return res
 
     def __iter__(self):
-        return iter(self.ties)
+        return iter(self.switches)
 
     def __len__(self):
-        return len(self.ties)
+        return len(self.switches)
 
     def __getitem__(self, key):
-        return self.ties.__getitem__(key)
+        return self.switches.__getitem__(key)
 
 
 class BinaryOut(object):

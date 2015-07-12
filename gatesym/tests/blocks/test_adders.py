@@ -8,8 +8,8 @@ from gatesym.blocks import adders
 
 def test_half_adder():
     network = core.Network()
-    a = gates.Tie(network)
-    b = gates.Tie(network)
+    a = gates.Switch(network)
+    b = gates.Switch(network)
     r, c = adders.half_adder(a, b)
     network.drain()
 
@@ -40,9 +40,9 @@ def test_half_adder():
 
 def test_full_adder():
     network = core.Network()
-    a = gates.Tie(network)
-    b = gates.Tie(network)
-    c = gates.Tie(network)
+    a = gates.Switch(network)
+    b = gates.Switch(network)
+    c = gates.Switch(network)
     r, co = adders.full_adder(a, b, c)
     network.drain()
 

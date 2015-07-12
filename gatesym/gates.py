@@ -73,10 +73,18 @@ class Gate(Node):
 
 
 class Tie(Gate):
-    def __init__(self, network, value=False):
+    def __init__(self, network, value):
         value = bool(value)
         index = network.add_gate(core.TIE)
         super(Tie, self).__init__(network, index, "tie")
+        self.network.write(self.index, value)
+
+
+class Switch(Gate):
+    def __init__(self, network, value=False):
+        value = bool(value)
+        index = network.add_gate(core.SWITCH)
+        super(Switch, self).__init__(network, index, "switch")
         self.write(value)
 
     def write(self, value):

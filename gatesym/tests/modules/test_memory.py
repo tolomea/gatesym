@@ -8,8 +8,8 @@ from gatesym.modules import memory
 
 def test_memory():
     network = core.Network()
-    clock = gates.Tie(network)
-    write_flag = gates.Tie(network)
+    clock = gates.Switch(network)
+    write_flag = gates.Switch(network)
     address = test_utils.BinaryIn(network, 8)
     data_in = test_utils.BinaryIn(network, 8)
     mem = memory.memory(clock, write_flag, address, data_in, 4)
@@ -45,8 +45,8 @@ def test_memory():
 
 def test_rom():
     network = core.Network()
-    clock = gates.Tie(network)
-    write_flag = gates.Tie(network)
+    clock = gates.Switch(network)
+    write_flag = gates.Switch(network)
     address = test_utils.BinaryIn(network, 8)
     data_in = test_utils.BinaryIn(network, 8)
     data = [random.randrange(256) for i in range(16)]
