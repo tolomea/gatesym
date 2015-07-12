@@ -14,10 +14,12 @@ class Node(object):
     def __init__(self, name, block=None):
         self.name = name
         self.outputs = []
+        self.inputs = []
         self.block = block
 
     def attach_output(self, output):
         self.outputs.append(output)
+        output.inputs.append(self)
 
     @property
     def all_outputs(self):
@@ -48,6 +50,16 @@ class Node(object):
     def watch(self, name):
         self.network.watch(self.index, name)
 
+    def full_name(self):
+        possible_inputs = [i for i in self.inputs if ")" not in i.name]
+
+        if possible_inputs:
+            print [i.name for i in self.inputs]
+            return possible_inputs[0].full_name() + "." + self.name
+        else:
+            print [i.name for i in self.inputs]
+            return self.name
+
 
 class Gate(Node):
     """ handles to gates in the core """
@@ -75,7 +87,7 @@ class Gate(Node):
 class Tie(Gate):
     def __init__(self, network, value):
         value = bool(value)
-        index = network.add_gate(core.TIE)
+        index = network.add_gate(core.TIE, self)
         super(Tie, self).__init__(network, index, "tie")
         self.network.write(self.index, value)
 
@@ -83,7 +95,7 @@ class Tie(Gate):
 class Switch(Gate):
     def __init__(self, network, value=False):
         value = bool(value)
-        index = network.add_gate(core.SWITCH)
+        index = network.add_gate(core.SWITCH, self)
         super(Switch, self).__init__(network, index, "switch")
         self.write(value)
 
@@ -95,7 +107,7 @@ class And(Gate):
     def __init__(self, *inputs):
         assert inputs
         network = inputs[0].network
-        index = network.add_gate(core.AND)
+        index = network.add_gate(core.AND, self)
         super(And, self).__init__(network, index, "and", inputs)
 
 
@@ -103,7 +115,7 @@ class Or(Gate):
     def __init__(self, *inputs):
         assert inputs
         network = inputs[0].network
-        index = network.add_gate(core.OR)
+        index = network.add_gate(core.OR, self)
         super(Or, self).__init__(network, index, "or", inputs)
 
 
@@ -150,7 +162,15 @@ class Placeholder(Node):
         super(Placeholder, self).__init__("placeholder")
         self.network = network
         self.connected = []
+        self.attached = []
         self.actual = None
+
+    def attach_output(self, output):
+        """ connect an output at the logical level, output can be any node """
+        if self.actual:
+            self.actual.attach_output(output)
+        else:
+            self.attached.append(output)
 
     def connect_output(self, output, negate):
         if self.actual:
@@ -159,8 +179,9 @@ class Placeholder(Node):
             self.connected.append((output, negate))
 
     def replace(self, input):
+        assert not self.actual
         self.actual = input
-        for o in self.outputs:
+        for o in self.attached:
             input.attach_output(o)
         for o, n in self.connected:
             input.connect_output(o, n)

@@ -8,10 +8,10 @@ import collections
 TIE, SWITCH, AND, OR = range(4)
 
 
-class _Gate(collections.namedtuple("_Gate", "type_, inputs, neg_inputs, outputs")):
+class _Gate(collections.namedtuple("_Gate", "type_, inputs, neg_inputs, outputs, cookie")):
     # internal gate format
-    def __new__(cls, type_):
-        return super(_Gate, cls).__new__(cls, type_, set(), set(), set())
+    def __new__(cls, type_, cookie):
+        return super(_Gate, cls).__new__(cls, type_, set(), set(), set(), cookie)
 
 
 class Network(object):
@@ -22,10 +22,10 @@ class Network(object):
         self.watches = []
         self.log = []
 
-    def add_gate(self, type_):
+    def add_gate(self, type_, cookie):
         assert type_ in [TIE, SWITCH, AND, OR]
         index = len(self._gates)
-        self._gates.append(_Gate(type_))
+        self._gates.append(_Gate(type_, cookie))
         self._values.append(False)
         return index
 
