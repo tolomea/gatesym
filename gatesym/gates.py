@@ -18,8 +18,13 @@ class Node(object):
         self.block = block
 
     def attach_output(self, output):
+        """ connect an output at the logical level, output can be any node """
         self.outputs.append(output)
         output.inputs.append(self)
+
+    def connect_output(self, output, negate):
+        """ connect an output at the phycical level, output must be a gate """
+        raise NotImplementedError
 
     @property
     def all_outputs(self):
@@ -68,11 +73,8 @@ class Gate(Node):
         self.network = network
         self.index = index
         for input_ in inputs:
-            self.add_input(input_)
-
-    def add_input(self, input_):
-        input_.attach_output(self)
-        input_.connect_output(self, False)
+            input_.attach_output(self)
+            input_.connect_output(self, False)
 
     def __repr__(self):
         return "{self.__class__.__name__}<{self.index}>({value})".format(self=self, value=self.read())
