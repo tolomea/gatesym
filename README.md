@@ -1,6 +1,6 @@
 # Gate Simulator
-* A logic gate level simulation.
-* A OISC CPU implemented in said simulation
+* A simulation of a network of logic gates
+* An OISC CPU implemented in said simulation
 * A minimal assembler
 * A couple of programs to be assembled and run on the CPU
 
@@ -8,35 +8,34 @@
 n.b. the gates, blocks and modules functions (and constructors) all take their input gates (and any additional parameters) as arguments and return their output gate(s)
 * core.py - the actual (and entire) simulation implementation
 * gates.py - a convenience layer over the core that represents gates as objects making it easier to create networks of them
-* utils.py - a couple of small utilities for use with the convenience layer
-* test_utils.py - a couple of small utilities used in the tests
-* blocks - functions for constuction several functional logic units (adders, muxes etc) from gate objects
-* modules - functions for constructing cpu sub modules from gates objects and blocks
+* blocks - functions for constucting several functional blocks (adders, muxes etc) from Gates
+* modules - functions for constructing CPU sub modules from Gates and blocks
 * computer.py - OISC computer, assembler and example programs
 
 # Core.py
 The main class here is Network. It represents and updates a network of gates. Gates can be of type AND, OR, TIE or SWITCH. TIE and SWITCH are both literal values that can't take inputs, there is no implementation difference between them but the symantic difference can be useful to the user.
 The Network class has the following functions of note:
-* add_gate(type) - insert a new gate of the given type and return it's index, types can be
-* add_link(source_index, destination_index, negate) - create a link from the output of the source gate to the input of the destination, optional negated along the way
+* add_gate(type) - create a new gate of the given type and return it's index
+* add_link(source_index, destination_index, negate) - create a link from the output of the source gate to the input of the destination
 * read(gate_index) - read the output of a gate
 * write(gate_index, value) - write the output of a gate, useful for ties and switches
 * step() - recalculate the output of all gates currently in the queue, for any whose values change queue their outputs
 * drain() - iterate on step until the queue is empty, return the number of iterations run
+
 There is also some minimal debugging support
 * watch(gate_index, name) - flag the given gate to be included in logging
 * record_log() - log the current values of the flagged gates
 * print_log() - dump out the log contents
 
-Internally individual gates are stored in an list indexed by order of creation and are represented as tuples of their type, input gate indicies, negated input gate indicies and outputs gate indicies. Having negated inputs removes the need to have explicit not gates, which is useful as otherwise we'd accumulate lots of redundant not gates and I haven't figured out a convenient way of doing optimization yet.
+Internally individual gates are stored in a list indexed by order of creation and are represented as tuples of their type, input gate indicies, negated input gate indicies and outputs gate indicies. Having negated inputs removes the need to have explicit not gates, which is useful as otherwise we'd accumulate lots of redundant not gates and I haven't figured out a convenient way of doing optimization yet.
 
 # Gates.py
 While the core makes for a reasonably fast simulation it's not the most user friendly. Gates builds a logical layer over the physical layer of of the core. This layer makes construction and debugging of gate networks far more convenient. In this layer Gates are represented as objects which know their underlying network and index. There is also a higher level Node abstraction from which Gates inherit, this lets us have virtual gates for points in the network that don't have actual gates. Classes of note are:
-* Node - a point in the Gate graph
+* Node - a point in the Gate network
 * Gate - a Node which is associated with a gate in the underlying core Network
 * Tie / Switch / And / Or - the various gate types from the core
 * Not - a virtual Gate that serves as a convenience access for another Gate with it's output negated
-* Link - a marker for an interesting point in the network, convenient for marking module boundaries
+* Link - a marker for an interesting point in the network, convenient for marking block boundaries
 * Placeholder - a virtual gate to hold a place until the actual gate is provided later, unseful for constructing loops
 * Block - represents a functional block, intended to be used with the block decorator
 * block - treats the arguments and return of a function as a block boundary creating useful Link nodes
@@ -55,14 +54,52 @@ This directory contains a variety of functional modules. They generally take the
 * multipliers.py - a ripple multiplier
 * mux.py - bit and word muxes and their constituent parts
 
+# OISC overview
+The OISC is a move machine, this means all functionality is exposed as memory mapped modules and the only instruction is to copy a value from one memory location to another. For example an add module might expose 4 memory addresses for the two operands, the result and the carry flag. Addition would be carried out by copying values into the operands and then copying the result out to somewhere else. The OISC consists of a core and a number of modules all connected by a bus.
+```
+   +-----------------------------+
+   |                             |
+ +-----------------------------+ <--+
+ | |                           | |  |
+ | |         MODULES           <----+
+ | |                           | |  |
+ | +--^-----^-------^------------+  |
+ |    |     |       |     |    |    |
+ +------^-----^-------^--------+    |
+      | |   | |     | |   | |       |
+      +-+   +-+     |W|   |D|       |
+      |     |       |R|   |A|       |
+      |     |       |I|   |T|       |
+      |     |       |T|   |A|       |
+      |     |       |E|   | |       |
+      |    A|       | |   | |       |
+     D|    D|    +--------v-v--+    |
+     A|    D|    |             |    |
+     T|    R+---->     BUS     |    |
+     A|    E|    |             |    |
+      |    S|    +---^---------+    |
+      |    S|        |     |        |
+      |     |       W|    D|    +-------+
+      |     |       R|    A|    |       |
+      |     |       I|    T|    | CLOCK |
+      |     |       T|    A|    |       |
+      |     |       E|     |    +-------+
+      |     |        |     |        |
+    +----------------------v--+     |
+    |                         |     |
+    |          CORE           <-----+
+    |                         |
+    +-------------------------+
+```
+
 # Modules
-This directory contains the various modules used in the OISC. The OISC is a move machine, this means all functionality is exposed as memory mapped modules and the only instruction is to copy a value from one memory location to another. For example an add module might expose 4 memory addresses for the two operands, the result and the carry flag. Addition would be carried out by copying values into the operands and then copying the result out to somewhere else. The OISC consists of a core and a number of modules all connected by a bus.
-* cpu_core.py - Implements the core 4 stage loop:
+This directory contains the various modules used in the OISC.
+* cpu_core.py - Holds the PC and implements the core 4 stage loop:
     * fetch address from pc and increment pc
     * fetch value from address
     * fetch address from pc and increment pc
     * store value to address
-* bus.py - Fans out the address lines to the modules and muxes the data lines coming back to the CPU
+* bus.py - Switches the write line to the modules and muxes the data lines coming back to the CPU
 * jump.py - A module that exposes the PC for reading and writing (either directly or conditionally)
 * literals.py - A module that mirrors the address bits back to the data lines as an easy way of getting literal values
 * math.py - Add and Sub modules
