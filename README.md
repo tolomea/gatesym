@@ -5,12 +5,13 @@
 * A couple of programs to be assembled and run on the CPU
 
 # Files
-n.b. the gates, blocks and modules functions (and constructors) all take their input gates (and any additional parameters) as arguments and return their output gate(s)
 * core.py - the actual (and entire) simulation implementation
 * gates.py - a convenience layer over the core that represents gates as objects making it easier to create networks of them
 * blocks - functions for constucting several functional blocks (adders, muxes etc) from Gates
 * modules - functions for constructing CPU sub modules from Gates and blocks
 * computer.py - OISC computer, assembler and example programs
+
+n.b. the gates, blocks and modules functions (and constructors) all take their input gates (and any additional parameters) as arguments and return their output gate(s)
 
 # Core.py
 The main class here is Network. It represents and updates a network of gates. Gates can be of type AND, OR, TIE or SWITCH. TIE and SWITCH are both literal values that can't take inputs, there is no implementation difference between them but the symantic difference can be useful to the user.
