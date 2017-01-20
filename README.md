@@ -54,3 +54,16 @@ This directory contains a variety of functional modules. They generally take the
 * latches.py - basic memory elements
 * multipliers.py - a ripple multiplier
 * mux.py - bit and word muxes and their constituent parts
+
+# Modules
+This directory contains the various modules used in the OISC. The OISC is a move machine, this means all functionality is exposed as memory mapped modules and the only instruction is to copy a value from one memory location to another. For example an add module might expose 4 memory addresses for the two operands, the result and the carry flag. Addition would be carried out by copying values into the operands and then copying the result out to somewhere else. The OISC consists of a core and a number of modules all connected by a bus.
+* cpu_core.py - Implements the core 4 stage loop:
+    * fetch address from pc and increment pc
+    * fetch value from address
+    * fetch address from pc and increment pc
+    * store value to address
+* bus.py - Fans out the address lines to the modules and muxes the data lines coming back to the CPU
+* jump.py - A module that exposes the PC for reading and writing (either directly or conditionally)
+* literals.py - A module that mirrors the address bits back to the data lines as an easy way of getting literal values
+* math.py - Add and Sub modules
+* memory.py - Rom and Ram modules
