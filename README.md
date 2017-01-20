@@ -28,7 +28,7 @@ There is also some minimal debugging support
 * record_log() - log the current values of the flagged gates
 * print_log() - dump out the log contents
 
-Internally individual gates are stored in an array indexed by order of creation and are represented as tuples of their type, input gate indicies, negated input gate indicies and outputs gate indicies. Having negated inputs removes the need to have explicit not gates, which is useful as otherwise we'd accumulate lots of redundant not gates and I haven't figured out a convenient way of doing optimization yet.
+Internally individual gates are stored in an list indexed by order of creation and are represented as tuples of their type, input gate indicies, negated input gate indicies and outputs gate indicies. Having negated inputs removes the need to have explicit not gates, which is useful as otherwise we'd accumulate lots of redundant not gates and I haven't figured out a convenient way of doing optimization yet.
 
 # Gates.py
 While the core makes for a reasonably fast simulation it's not the most user friendly. Gates builds a logical layer over the physical layer of of the core. This layer makes construction and debugging of gate networks far more convenient. In this layer Gates are represented as objects which know their underlying network and index. There is also a higher level Node abstraction from which Gates inherit, this lets us have virtual gates for points in the network that don't have actual gates. Classes of note are:
@@ -48,4 +48,9 @@ Nodes have names and some useful debugging functionality for traversing the netw
 
 When traversing nodes like this you can skip from a block input directly to any output of the same block
 
-
+# Blocks
+This directory contains a variety of functional modules. They generally take their input Gates as arguments and return their output Gates. Many of them operate on words which are represented as lists of Gates and they will self size to those words. So for example if given two 8bit words as input the ripple_adder function will return the output word and carry bit of an 8bit ripple adder.
+* adders.py - a variety of adder and subtractor units ranging from a half adder up to a multiword ripple sum unit
+* latches.py - basic memory elements
+* multipliers.py - a ripple multiplier
+* mux.py - bit and word muxes and their constituent parts
