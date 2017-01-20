@@ -9,6 +9,15 @@ from gatesym.utils import PlaceholderWord
 
 @block
 def cpu_core(clock, data_in, pc_in, write_pc, debug=False):
+    """
+    the core CPU state machine
+    executes a 4 state loop continuously
+    s0: fetch address from pc
+    s1: fetch value from address and increment pc
+    s2: fetch address from pc
+    s3: store value to address and increment pc
+    """
+
     network = clock.network
     word_size = len(data_in)
 
@@ -18,7 +27,7 @@ def cpu_core(clock, data_in, pc_in, write_pc, debug=False):
     state.replace(register(incr, clock))
     s0, s1, s2, s3 = address_decode(state)
 
-    # pc increments in s1 and s3, incoming pc writes are taken in s3
+    # pc increments in s1 and s3, incoming pc writes from the jump module are taken in s3
     pc = PlaceholderWord(network, word_size)
     incr, c = ripple_incr(pc)
     jumping = And(write_pc, s3)
@@ -29,12 +38,15 @@ def cpu_core(clock, data_in, pc_in, write_pc, debug=False):
     # clock in address in s0 and s2
     addr = register(data_in, And(clock, Or(s0, s2)))
 
-    # send address as pc in s0 and s2 and addr in s1 and s3
+    # set address lines to pc in s0 and s2 and to the previously fetched address in s1 and s3
     addr_out = word_switch([Or(s0, s2), Or(s1, s3)], pc, addr)
 
-    # write out data in stage3
+    # read in data in s1
+    data = register(data_in, And(clock, s1))
+
+    # write out data in s3
     write_out = s3
-    data_out = register(data_in, And(clock, s1))
+    data_out = data
 
     if debug:
         clock.watch("clock")

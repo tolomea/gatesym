@@ -163,7 +163,7 @@ def test_jmp2():
         network.drain()
 
     addr, data_out, write = cpu_core(clock, data_in, pc_in, write_pc)
-    write_pc = write_pc.replace(And(write, mux.equals(102, addr)))
+    write_pc = write_pc.replace(And(write, mux.address_matches(102, addr)))
     pc_in = pc_in.replace(data_out)
 
     addr = BinaryOut(addr)

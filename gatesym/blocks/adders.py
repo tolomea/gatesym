@@ -5,6 +5,7 @@ from gatesym.gates import And, Or, Not, block, Tie
 
 @block
 def half_adder(a, b):
+    """ add two bits, return a sum and a carry """
     carry = And(a, b)
     result = Or(And(a, Not(b)), And(Not(a), b))
     return result, carry
@@ -12,6 +13,7 @@ def half_adder(a, b):
 
 @block
 def full_adder(a, b, c):
+    """ chain two half adders to add two bits and a previous carry, again returning a sum and a carry """
     s1, c1 = half_adder(a, b)
     s2, c2 = half_adder(s1, c)
     return s2, Or(c1, c2)
@@ -19,6 +21,7 @@ def full_adder(a, b, c):
 
 @block
 def ripple_adder(aw, bw):
+    """ chain multiple full_adders to add two words returning a sum word and a carry bit """
     assert len(aw) == len(bw)
     r, c = half_adder(aw[0], bw[0])
     rw = [r]
@@ -30,6 +33,7 @@ def ripple_adder(aw, bw):
 
 @block
 def ripple_incr(word):
+    """ increment a word by 1 """
     c = Tie(word[0].network, True)
     rw = []
     for a in word:
@@ -40,6 +44,7 @@ def ripple_incr(word):
 
 @block
 def ripple_sum(*words):
+    """ sum multiple words """
     carries = []
     while len(words) > 1:
         new_words = []
@@ -55,13 +60,17 @@ def ripple_sum(*words):
 
 @block
 def half_subtractor(a, b):
-    carry = And(Not(a), b)
+    """ subtract bit B from bit A, return a difference and a borrow """
+    borrow = And(Not(a), b)
     result = Or(And(a, Not(b)), And(Not(a), b))
-    return result, carry
+    return result, borrow
 
 
 @block
 def full_subtractor(a, b, c):
+    """
+    chain two half subtractors to subtract bit B and previous borrow from A, again returning a difference and a borrow
+    """
     s1, c1 = half_subtractor(a, b)
     s2, c2 = half_subtractor(s1, c)
     return s2, Or(c1, c2)
@@ -69,6 +78,7 @@ def full_subtractor(a, b, c):
 
 @block
 def ripple_subtractor(aw, bw):
+    """ chain multiple full_subtractors to subtract word B from word A returning a difference word and a borrow bit """
     assert len(aw) == len(bw)
     r, c = half_subtractor(aw[0], bw[0])
     rw = [r]
