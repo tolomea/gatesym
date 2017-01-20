@@ -1,8 +1,15 @@
 # Gate Simulator
-* A simulation of a network of logic gates
-* An OISC CPU implemented in said simulation
-* A minimal assembler
-* A couple of programs to be assembled and run on the CPU
+This repo contains a simulator for networks of logic gates like you would find in any digital electronics chip.
+
+There is also an abstraction layer that makes constructing such networks very straight forward, for example a half adder would be:
+```
+def half_adder(a, b):
+    carry = And(a, b)
+    result = Or(And(a, Not(b)), And(Not(a), b))
+    return result, carry
+```
+
+Then there are libraries of fundamental functional blocks, like adders, muxes and memories. And ultimately an entire (simple) CPU along with an associated assembler and some basic example programs.
 
 # Files
 * core.py - the actual (and entire) simulation implementation
