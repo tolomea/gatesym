@@ -155,7 +155,7 @@ mov machine
     +-------------------------+
 
 
-optimizing
+network optimizations
     no outputs delete
     no inputs replace with tie
     negative tie into and replaces
@@ -164,10 +164,15 @@ optimizing
     positive tie into or replaces
     drop negative tie into or
     same inputs merge
+
+evaluation optimizations
+    could identify subnets whose output can't currently impact anything and skip updating the subnet
+    for example in the cpu the adder listens to the data bus
+    but reevaluating the adder internals is irrelevant until the address lines point at it
+
 new core operations
     need to split ties into ties and switches
     delete
     merge
     remove link
-
-
+    
