@@ -9,7 +9,8 @@
 * gates.py - a convenience layer over the core that represents gates as objects making it easier to create networks of them
 * blocks - functions for constucting several functional blocks (adders, muxes etc) from Gates
 * modules - functions for constructing CPU sub modules from Gates and blocks
-* computer.py - OISC computer, assembler and example programs
+* computer.py - OISC computer
+* main.py - assembler and example programs
 
 n.b. the gates, blocks and modules functions (and constructors) all take their input gates (and any additional parameters) as arguments and return their output gate(s)
 
@@ -96,12 +97,18 @@ The OISC is a move machine, this means all functionality is exposed as memory ma
 # Modules
 This directory contains the various modules used in the OISC.
 * cpu_core.py - Holds the PC and implements the core 4 stage loop:
-    * fetch address from pc and increment pc
-    * fetch value from address
-    * fetch address from pc and increment pc
-    * store value to address
+    * fetch address from pc
+    * fetch value from address and increment pc
+    * fetch address from pc 
+    * store value to address and increment pc
 * bus.py - Switches the write line to the modules and muxes the data lines coming back to the CPU
 * jump.py - A module that exposes the PC for reading and writing (either directly or conditionally)
 * literals.py - A module that mirrors the address bits back to the data lines as an easy way of getting literal values
 * math.py - Add and Sub modules
 * memory.py - Rom and Ram modules
+
+# Computer.py
+Constructs a full computer from the modules, returning a "print" word and a write flag indicating when there is new data in it. It also contains a "symbols" dict that has the addresses of all the operations.
+
+# Main.py
+Has a basic assembler and some example programs along with a main function that instantiates and runs the computer.
