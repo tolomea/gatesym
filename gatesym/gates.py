@@ -11,6 +11,7 @@ from gatesym import core
 
 class Node(object):
     """ a point in the network of gates """
+
     def __init__(self, name, block=None):
         self.name = name
         self.outputs = []
@@ -59,15 +60,16 @@ class Node(object):
         possible_inputs = [i for i in self.inputs if ")" not in i.name]
 
         if possible_inputs:
-            print [i.name for i in self.inputs]
+            print([i.name for i in self.inputs])
             return possible_inputs[0].full_name() + "." + self.name
         else:
-            print [i.name for i in self.inputs]
+            print([i.name for i in self.inputs])
             return self.name
 
 
 class Gate(Node):
     """ handles to gates in the core """
+
     def __init__(self, network, index, name, inputs=[]):
         super(Gate, self).__init__(name)
         self.network = network
@@ -87,6 +89,7 @@ class Gate(Node):
 
 
 class Tie(Gate):
+
     def __init__(self, network, value):
         value = bool(value)
         index = network.add_gate(core.TIE, self)
@@ -95,6 +98,7 @@ class Tie(Gate):
 
 
 class Switch(Gate):
+
     def __init__(self, network, value=False):
         value = bool(value)
         index = network.add_gate(core.SWITCH, self)
@@ -106,6 +110,7 @@ class Switch(Gate):
 
 
 class And(Gate):
+
     def __init__(self, *inputs):
         assert inputs
         network = inputs[0].network
@@ -114,6 +119,7 @@ class And(Gate):
 
 
 class Or(Gate):
+
     def __init__(self, *inputs):
         assert inputs
         network = inputs[0].network
@@ -127,6 +133,7 @@ def nand(*inputs):
 
 class Link(Node):
     """ interesting steps along the path between two gates """
+
     def __init__(self, node, name, block=None):
         super(Link, self).__init__(name, block=block)
         self.node = node
@@ -148,6 +155,7 @@ class Link(Node):
 
 
 class Not(Link):
+
     def __init__(self, node):
         super(Not, self).__init__(node, "not")
 
@@ -160,6 +168,7 @@ class Not(Link):
 
 class Placeholder(Node):
     """ a placeholder we will replace with a real node later """
+
     def __init__(self, network):
         super(Placeholder, self).__init__("placeholder")
         self.network = network
@@ -200,16 +209,17 @@ def link_factory(obj, name1, name2, in_block=None, out_block=None):
             name1 = name1 + ","
         return [link_factory(o, name1 + str(i), name2, in_block, out_block) for i, o in enumerate(obj)]
     elif isinstance(obj, Node):
-        l = Link(obj, name1 + name2, block=in_block)
+        link = Link(obj, name1 + name2, block=in_block)
         if out_block:
-            out_block.outputs.append(l)
-        return l
+            out_block.outputs.append(link)
+        return link
     else:
         return obj
 
 
 class Block(object):
     """ wrapper around a functional block """
+
     def __init__(self, name):
         self.name = name
         self.outputs = []

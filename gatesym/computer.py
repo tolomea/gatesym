@@ -179,14 +179,14 @@ def assemble(code):
     labels = {}
     i = 0
     for c in code:
-        if isinstance(c, basestring) and c.endswith(":"):
+        if isinstance(c, str) and c.endswith(":"):
             labels[c[:-1]] = i
         else:
             i += 1
 
     res = []
     for c in code:
-        if isinstance(c, basestring):
+        if isinstance(c, str):
             if not c.endswith(":"):
                 res.append(LIT_BASE + labels[c])
         else:
@@ -199,7 +199,7 @@ def main():
     clock = Switch(network)
     write, res = computer(clock, primes())
 
-    print "size:", profiler.size(network)
+    print("size:", profiler.size(network))
 
     res = BinaryOut(res)
     network.drain()
@@ -211,4 +211,4 @@ def main():
         clock.write(False)
         network.drain()
         if output:
-            print res.read()
+            print(res.read())

@@ -10,11 +10,13 @@ TIE, SWITCH, AND, OR = range(4)
 
 class _Gate(collections.namedtuple("_Gate", "type_, inputs, neg_inputs, outputs, cookie")):
     # internal gate format
+
     def __new__(cls, type_, cookie):
         return super(_Gate, cls).__new__(cls, type_, set(), set(), set(), cookie)
 
 
 class Network(object):
+
     def __init__(self):
         self._gates = []
         self._values = []
@@ -83,7 +85,7 @@ class Network(object):
 
     def dump(self):
         for i, (v, g) in enumerate(zip(self._values, self._gates)):
-            print i, v, g
+            print(i, v, g)
 
     def record_log(self):
         new_log = []
@@ -99,5 +101,5 @@ class Network(object):
         if self.watches:
             name_len = max(len(n) for n, i in self.watches)
             for (name, index), row in zip(self.watches, zip(*self.log)):
-                print "{0:{1}} {2}".format(name, name_len, "".join(str(i) for i in row))
-            print
+                print("{0:{1}} {2}".format(name, name_len, "".join(str(i) for i in row)))
+            print()

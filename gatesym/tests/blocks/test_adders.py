@@ -113,7 +113,7 @@ def test_ripple_adder():
     for i in range(10):
         v1 = random.randrange(256)
         v2 = random.randrange(256)
-        print v1, v2
+        print(v1, v2)
         a.write(v1)
         b.write(v2)
         network.drain()
@@ -129,7 +129,7 @@ def test_ripple_incr():
 
     for i in range(10):
         v = random.randrange(255)
-        print v
+        print(v)
         a.write(v)
         network.drain()
         assert c.read() == 0
@@ -151,7 +151,7 @@ def test_ripple_sum():
 
     for i in range(10):
         values = [random.randrange(512 // count) for i in range(count)]
-        print values
+        print(values)
         for i, v in zip(inputs, values):
             i.write(v)
         network.drain()
@@ -169,7 +169,7 @@ def test_ripple_subtractor():
     for i in range(10):
         v1 = random.randrange(256)
         v2 = random.randrange(256)
-        print v1, v2
+        print(v1, v2)
         a.write(v1)
         b.write(v2)
         network.drain()

@@ -16,7 +16,7 @@ def test_ripple_multiplier():
     for i in range(10):
         v1 = random.randrange(32)
         v2 = random.randrange(32)
-        print v1, v2
+        print(v1, v2)
         a.write(v1)
         b.write(v2)
         network.drain()

@@ -22,7 +22,7 @@ def ripple_adder(aw, bw):
     assert len(aw) == len(bw)
     r, c = half_adder(aw[0], bw[0])
     rw = [r]
-    for a, b in zip(aw, bw)[1:]:
+    for a, b in zip(aw[1:], bw[1:]):
         r, c = full_adder(a, b, c)
         rw.append(r)
     return rw, c
@@ -72,7 +72,7 @@ def ripple_subtractor(aw, bw):
     assert len(aw) == len(bw)
     r, c = half_subtractor(aw[0], bw[0])
     rw = [r]
-    for a, b in zip(aw, bw)[1:]:
+    for a, b in zip(aw[1:], bw[1:]):
         r, c = full_subtractor(a, b, c)
         rw.append(r)
     return rw, c
