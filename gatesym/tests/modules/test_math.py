@@ -6,83 +6,105 @@ from gatesym import core, gates, test_utils
 from gatesym.modules import math
 
 
-def test_adder_adding():
-    network = core.Network()
-    clock = gates.Switch(network)
-    write_flag = gates.Switch(network)
-    address = test_utils.BinaryIn(network, 2)
-    data_in = test_utils.BinaryIn(network, 8)
-    adder = math.add(clock, write_flag, address, data_in)
-    data_out = test_utils.BinaryOut(adder)
-    network.drain()
+class Helper(object):
 
-    def write(value, addr):
-        data_in.write(value)
-        address.write(addr)
-        write_flag.write(1)
-        clock.write(1)
-        network.drain()
-        clock.write(0)
-        network.drain()
-        write_flag.write(0)
+    def __init__(self, module_func):
+        self.network = core.Network()
+        self.clock = gates.Switch(self.network)
+        self.write_flag = gates.Switch(self.network)
+        self.address = test_utils.BinaryIn(self.network, 3)
+        self.data_in = test_utils.BinaryIn(self.network, 8)
+        module = module_func(self.clock, self.write_flag, self.address, self.data_in)
+        self.data_out = test_utils.BinaryOut(module)
+        self.network.drain()
 
-    def read(addr):
-        address.write(addr)
-        write_flag.write(0)
-        network.drain()
-        return data_out.read()
+    def write(self, value, addr):
+        self.data_in.write(value)
+        self.address.write(addr)
+        self.write_flag.write(1)
+        self.clock.write(1)
+        self.network.drain()
+        self.clock.write(0)
+        self.network.drain()
+        self.write_flag.write(0)
+
+    def read(self, addr):
+        self.address.write(addr)
+        self.write_flag.write(0)
+        self.network.drain()
+        return self.data_out.read()
+
+
+def test_adder():
+    helper = Helper(math.add)
 
     for i in range(10):
         v1 = random.randrange(256)
-        write(v1, 0)
-        assert read(0) == v1
+        helper.write(v1, 0)
+        assert helper.read(0) == v1
 
         v2 = random.randrange(256)
-        write(v2, 1)
-        assert read(1) == v2
+        helper.write(v2, 1)
+        assert helper.read(1) == v2
 
-        res = read(2)
+        res = helper.read(2)
         assert res == (v1 + v2) % 256
-        res = read(3)
+        res = helper.read(3)
         assert res == (v1 + v2) // 256
 
 
-def test_adder_subtracting():
-    network = core.Network()
-    clock = gates.Switch(network)
-    write_flag = gates.Switch(network)
-    address = test_utils.BinaryIn(network, 2)
-    data_in = test_utils.BinaryIn(network, 8)
-    subtractor = math.sub(clock, write_flag, address, data_in)
-    data_out = test_utils.BinaryOut(subtractor)
-    network.drain()
-
-    def write(value, addr):
-        data_in.write(value)
-        address.write(addr)
-        write_flag.write(1)
-        clock.write(1)
-        network.drain()
-        clock.write(0)
-        network.drain()
-        write_flag.write(0)
-
-    def read(addr):
-        address.write(addr)
-        write_flag.write(0)
-        network.drain()
-        return data_out.read()
+def test_subtractor():
+    helper = Helper(math.sub)
 
     for i in range(10):
         v1 = random.randrange(256)
-        write(v1, 0)
-        assert read(0) == v1
+        helper.write(v1, 0)
+        assert helper.read(0) == v1
 
         v2 = random.randrange(256)
-        write(v2, 1)
-        assert read(1) == v2
+        helper.write(v2, 1)
+        assert helper.read(1) == v2
 
-        res = read(2)
+        res = helper.read(2)
         assert res == (v1 - v2) % 256
-        res = read(3)
+        res = helper.read(3)
+        assert res == (v1 < v2)
+
+
+def test_compact_adder():
+    helper = Helper(math.compact_add)
+
+    for i in range(10):
+        v1 = random.randrange(256)
+        helper.write(v1, 0)
+
+        v2 = random.randrange(256)
+        helper.write(v2, 1)
+
+        res = helper.read(0)
+        assert res == (v1 + v2) % 256
+        res = helper.read(1)
+        assert res == (v1 + v2) // 256
+
+
+def test_combined():
+    helper = Helper(math.combined)
+
+    for i in range(10):
+        v1 = random.randrange(256)
+        helper.write(v1, 0)
+        assert helper.read(0) == v1
+
+        v2 = random.randrange(256)
+        helper.write(v2, 1)
+        assert helper.read(1) == v2
+
+        res = helper.read(2)
+        assert res == (v1 + v2) % 256
+        res = helper.read(3)
+        assert res == (v1 + v2) // 256
+
+        res = helper.read(4)
+        assert res == (v1 - v2) % 256
+        res = helper.read(5)
         assert res == (v1 < v2)

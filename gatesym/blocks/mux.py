@@ -42,6 +42,7 @@ def bit_mux(address, *data):
 @block
 def word_switch(control_lines, *data):
     """ select the words(s) from the data that match the enabled control line(s) (generally only 1) """
+    assert len(control_lines) >= len(data)
     word_size = len(data[0])
     assert all(len(d) == word_size for d in data)
 
