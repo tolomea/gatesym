@@ -12,7 +12,7 @@ from gatesym import core
 class Node(object):
     """ a point in the network of gates """
 
-    def __init__(self, name, block=None):
+    def __init__(self, name):
         self.name = name
         self.outputs = []
         self.inputs = []
@@ -29,10 +29,7 @@ class Node(object):
 
     @property
     def all_outputs(self):
-        if self.block:
-            return self.block.outputs + self.outputs
-        else:
-            return self.outputs
+        return self.outputs
 
     def find(self, path, location=""):
         if location:
@@ -134,8 +131,10 @@ def nand(*inputs):
 class Link(Node):
     """ interesting steps along the path between two gates """
 
-    def __init__(self, node, name, block=None):
-        super(Link, self).__init__(name, block=block)
+    def __init__(self, node, name, block, is_output):
+        super(Link, self).__init__(name)
+        self.block = block
+        self.is_output = is_output
         self.node = node
         node.attach_output(self)
 
@@ -153,11 +152,18 @@ class Link(Node):
     def index(self):
         return self.node.index
 
+    @property
+    def all_outputs(self):
+        if self.block and not self.is_output:
+            return self.block.outputs + self.outputs
+        else:
+            return self.outputs
+
 
 class Not(Link):
 
     def __init__(self, node):
-        super(Not, self).__init__(node, "not")
+        super(Not, self).__init__(node, "not", None, False)
 
     def read(self):
         return not self.node.read()
@@ -202,16 +208,18 @@ class Placeholder(Node):
         return getattr(self.actual, name)
 
 
-def link_factory(obj, name1, name2, in_block=None, out_block=None):
+def link_factory(obj, name1, name2, block, is_output):
     """ wrap links around a bunch of nodes in an arbitrarily nested structure """
     if isinstance(obj, collections.Iterable):
         if name1 and not name1.endswith("("):
             name1 = name1 + ","
-        return [link_factory(o, name1 + str(i), name2, in_block, out_block) for i, o in enumerate(obj)]
+        return [link_factory(o, name1 + str(i), name2, block, is_output) for i, o in enumerate(obj)]
     elif isinstance(obj, Node):
-        link = Link(obj, name1 + name2, block=in_block)
-        if out_block:
-            out_block.outputs.append(link)
+        link = Link(obj, name1 + name2, block, is_output)
+        if is_output:
+            block.outputs.append(link)
+        else:
+            block.inputs.append(link)
         return link
     else:
         return obj
@@ -223,13 +231,14 @@ class Block(object):
     def __init__(self, name):
         self.name = name
         self.outputs = []
+        self.inputs = []
 
 
 def _block(func, *args):
     block = Block(func.__name__)
-    args = link_factory(args, func.__name__ + "(", "", in_block=block)
+    args = link_factory(args, func.__name__ + "(", "", block, False)
     res = func(*args)
-    res = link_factory(res, "", ")", out_block=block)
+    res = link_factory(res, "", ")", block, True)
     return res
 
 
