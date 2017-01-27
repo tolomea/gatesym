@@ -21,8 +21,8 @@ class Network(object):
         self._gates = []
         self._values = []
         self._queue = set()
-        self.watches = []
-        self.log = []
+        self._watches = []
+        self._log = []
 
     def add_gate(self, type_, cookie):
         assert type_ in [TIE, SWITCH, AND, OR]
@@ -89,17 +89,17 @@ class Network(object):
 
     def record_log(self):
         new_log = []
-        for name, index in self.watches:
+        for name, index in self._watches:
             new_log.append(int(self.read(index)))
-        self.log.append(new_log)
+        self._log.append(new_log)
 
     def watch(self, index, name):
-        assert not self.log
-        self.watches.append((name, index))
+        assert not self._log
+        self._watches.append((name, index))
 
     def print_log(self):
-        if self.watches:
-            name_len = max(len(n) for n, i in self.watches)
-            for (name, index), row in zip(self.watches, zip(*self.log)):
+        if self._watches:
+            name_len = max(len(n) for n, i in self._watches)
+            for (name, index), row in zip(self._watches, zip(*self._log)):
                 print("{0:{1}} {2}".format(name, name_len, "".join(str(i) for i in row)))
             print()

@@ -1,5 +1,5 @@
 from gatesym.gates import Switch
-from gatesym import core, profiler
+from gatesym import core
 from gatesym.test_utils import BinaryOut
 from gatesym.computer import computer, symbols
 
@@ -104,8 +104,6 @@ def main():
     network = core.Network()
     clock = Switch(network)
     write, res = computer(clock, primes())
-
-    print("size:", profiler.size(network))
 
     res = BinaryOut(res)
     network.drain()
