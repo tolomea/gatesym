@@ -40,7 +40,12 @@ def fib():
 
 
 def primes():
-    return assemble(symbols, ["i", "j", "tmp"], [
+    return assemble(symbols, ["i", "j"], [
+        # i = 3
+        # start:
+        # j = 3
+        # loop_start:
+        # if i == j: goto loop_else  # ran out of numbers to check so i is prime
         3, "i",
         "start:",
         3, "j",
@@ -50,21 +55,30 @@ def primes():
         "loop_else", "JUMP_DEST",
         "SUB_R", "JUMP_ZERO",
 
-        "i", "tmp",
+        # tmp = i
+        # mod_loop:
+        # if tmp == 0: goto loop_end  # divides equally
+        # tmp -= j
+        # if tmp < 0: goto loop_mod  # didn't divide equally
+        "i", "SUB_A",
         "j", "SUB_B",
         "mod_loop:",
-        "tmp", "SUB_A",
-        "SUB_R", "tmp",
         "loop_end", "JUMP_DEST",
         "SUB_A", "JUMP_ZERO",
+        "SUB_R", "SUB_A",
         "mod_loop", "JUMP_DEST",
         "SUB_C", "JUMP_ZERO",
 
+        # j += 2
+        # goto loop_start
         2, "ADD_A",
         "j", "ADD_B",
         "ADD_R", "j",
-
         "loop_start", "JUMP",
+
+        # loop_else:
+        # print i
+        # i += 2
         "loop_else:",
         "i", "PRINT",
         "loop_end:",
@@ -72,6 +86,7 @@ def primes():
         "i", "ADD_B",
         "ADD_R", "i",
 
+        # goto start
         "start", "JUMP",
     ])
 
