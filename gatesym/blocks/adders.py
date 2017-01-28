@@ -46,12 +46,15 @@ def ripple_incr(word):
 def ripple_sum(*words):
     """ sum multiple words """
     carries = []
+    # iterate building layers of a binary tree structure
     while len(words) > 1:
         new_words = []
+        # add every adjacent pair, so 1+2, 3+4 etc
         for a, b in zip(words[::2], words[1::2]):
             res, carry = ripple_adder(a, b)
             carries.append(carry)
             new_words.append(res)
+        # if there is one left at the end just keep it in the next level up
         if len(words) % 2:
             new_words.append(words[-1])
         words = new_words

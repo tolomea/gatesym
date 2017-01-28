@@ -62,7 +62,7 @@ def test_2_and(input_type):
     b_idx = network.add_gate(input_type)
     idx = network.add_gate(core.AND)
     network.add_link(a_idx, idx)
-    network.add_link(b_idx, idx)
+    network.add_link(b_idx, idx, True)
 
     network.write(a_idx, False)
     network.write(b_idx, False)
@@ -74,11 +74,11 @@ def test_2_and(input_type):
     network.write(b_idx, False)
     assert network.read(idx) is False
     network.step()
-    assert network.read(idx) is False
+    assert network.read(idx) is True
 
     network.write(a_idx, False)
     network.write(b_idx, True)
-    assert network.read(idx) is False
+    assert network.read(idx) is True
     network.step()
     assert network.read(idx) is False
 
@@ -86,11 +86,11 @@ def test_2_and(input_type):
     network.write(b_idx, True)
     assert network.read(idx) is False
     network.step()
-    assert network.read(idx) is True
+    assert network.read(idx) is False
 
     network.write(a_idx, False)
     network.write(b_idx, False)
-    assert network.read(idx) is True
+    assert network.read(idx) is False
     network.step()
     assert network.read(idx) is False
 
@@ -134,17 +134,17 @@ def test_2_or(input_type):
     b_idx = network.add_gate(input_type)
     idx = network.add_gate(core.OR)
     network.add_link(a_idx, idx)
-    network.add_link(b_idx, idx)
+    network.add_link(b_idx, idx, True)
 
     network.write(a_idx, False)
     network.write(b_idx, False)
     assert network.read(idx) is False
     network.step()
-    assert network.read(idx) is False
+    assert network.read(idx) is True
 
     network.write(a_idx, True)
     network.write(b_idx, False)
-    assert network.read(idx) is False
+    assert network.read(idx) is True
     network.step()
     assert network.read(idx) is True
 
@@ -152,11 +152,11 @@ def test_2_or(input_type):
     network.write(b_idx, True)
     assert network.read(idx) is True
     network.step()
-    assert network.read(idx) is True
+    assert network.read(idx) is False
 
     network.write(a_idx, True)
     network.write(b_idx, True)
-    assert network.read(idx) is True
+    assert network.read(idx) is False
     network.step()
     assert network.read(idx) is True
 
@@ -164,7 +164,7 @@ def test_2_or(input_type):
     network.write(b_idx, False)
     assert network.read(idx) is True
     network.step()
-    assert network.read(idx) is False
+    assert network.read(idx) is True
 
 
 def test_step():

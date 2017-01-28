@@ -19,6 +19,7 @@ def tie_word(network, size, value=0):
 
 
 class PlaceholderWord(collections.Sequence):
+
     def __init__(self, network, size):
         self.placeholders = [Placeholder(network) for i in range(size)]
 
