@@ -162,6 +162,11 @@ class Network(object):
             aliases_by_type[self._gates[alias].type_] += 1
 
         return {
+            "size": self.get_size(),
             "gates_by_type": gates_by_type,
             "aliases_by_type": aliases_by_type,
         }
+
+    def get_size(self):
+        """ total count of all gates and aliases """
+        return len(self._gates)  # works cause we don't actually remove gates from the array when we alias them

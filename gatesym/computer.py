@@ -1,5 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 
+import collections
+
 from gatesym.gates import Placeholder
 from gatesym.utils import PlaceholderWord
 from gatesym.modules import bus, cpu_core, math, memory, literals, jump
@@ -16,6 +18,8 @@ SUB_BASE = 0x304
 JUMP_BASE = 0x308
 PRINT_BASE = 0x30c
 
+Module = collections.namedtuple("Module", "name base_address address_size data_lines write_line")
+
 
 def computer(clock, rom_content):
     network = clock.network
@@ -28,53 +32,60 @@ def computer(clock, rom_content):
     # rom
     rom_write = Placeholder(network)
     rom_data = memory.rom(clock, rom_write, address, data_out, ROM_SIZE, rom_content)
+    rom_module = Module("rom", ROM_BASE, ROM_SIZE, rom_data, rom_write)
 
     # add
     add_write = Placeholder(network)
     add_data = math.add(clock, add_write, address, data_out)
+    add_module = Module("add", ADD_BASE, 2, add_data, add_write)
 
     # sub
     sub_write = Placeholder(network)
     sub_data = math.sub(clock, sub_write, address, data_out)
+    sub_module = Module("sub", SUB_BASE, 2, sub_data, sub_write)
 
     # lit
     low_literal_write = Placeholder(network)
     low_literal_data = literals.low_literal(clock, low_literal_write, address, data_out, LIT_SIZE)
+    low_literal_module = Module("lit", LIT_BASE, LIT_SIZE, low_literal_data, low_literal_write)
 
     # print
     print_write = Placeholder(network)
     print_data = memory.memory(clock, print_write, address, data_out, 0)
+    print_module = Module("print", PRINT_BASE, 0, print_data, print_write)
 
     # ram
     ram_write = Placeholder(network)
     ram_data = memory.memory(clock, ram_write, address, data_out, RAM_SIZE)
+    ram_module = Module("ram", RAM_BASE, RAM_SIZE, ram_data, ram_write)
 
     # jump
     jump_write = Placeholder(network)
     jump_data, _pc_in, _pc_write = jump.jump(clock, jump_write, address, data_out)
     pc_in.replace(_pc_in)
     pc_write.replace(_pc_write)
+    jump_module = Module("jump", JUMP_BASE, 2, jump_data, jump_write)
 
     modules = [
-        (ROM_BASE, ROM_SIZE, rom_data),
-        (LIT_BASE, LIT_SIZE, low_literal_data),
-        (RAM_BASE, RAM_SIZE, ram_data),
-        (ADD_BASE, 2, add_data),
-        (SUB_BASE, 2, sub_data),
-        (JUMP_BASE, 2, jump_data),
-        (PRINT_BASE, 0, print_data),
+        rom_module,
+        low_literal_module,
+        ram_module,
+        add_module,
+        sub_module,
+        jump_module,
+        print_module,
     ]
 
-    data_from_bus, write_lines = bus.bus(address, write_out, modules)
+    data_from_bus, write_lines = bus.bus(address, write_out, [(m.base_address, m.address_size, m.data_lines) for m in modules])
 
     data_in.replace(data_from_bus)
-    rom_write.replace(write_lines[0])
-    low_literal_write.replace(write_lines[1])
-    ram_write.replace(write_lines[2])
-    add_write.replace(write_lines[3])
-    sub_write.replace(write_lines[4])
-    jump_write.replace(write_lines[5])
-    print_write.replace(write_lines[6])
+    for write_line, module in zip(write_lines, modules):
+        module.write_line.replace(write_line)
+
+    print("cpu", data_out[0].block.size)
+    for module in modules:
+        print(module.name, module.data_lines[0].block.size)
+    print("bus", data_from_bus[0].block.size)
 
     return print_write, print_data
 

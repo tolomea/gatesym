@@ -16,7 +16,7 @@ class Node(object):
         self.name = name
         self.outputs = []
         self.inputs = []
-        self.block = block
+        self.block = None
 
     def attach_output(self, output):
         """ connect an output at the logical level, output can be any node """
@@ -232,13 +232,32 @@ class Block(object):
         self.name = name
         self.outputs = []
         self.inputs = []
+        self.size = None
+
+
+def _find_network(thing):
+    if hasattr(thing, "network"):
+        return thing.network
+    if isinstance(thing, collections.Iterable):
+        for item in thing:
+            tmp = _find_network(item)
+            if tmp:
+                return tmp
+    return None
 
 
 def _block(func, *args):
+    network = _find_network(args)
+    old_size = network.get_size()
+
     block = Block(func.__name__)
+
     args = link_factory(args, func.__name__ + "(", "", block, False)
     res = func(*args)
     res = link_factory(res, "", ")", block, True)
+
+    block.size = network.get_size() - old_size
+
     return res
 
 

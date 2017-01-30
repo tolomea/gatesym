@@ -286,6 +286,7 @@ def test_merge():
     stats = network.get_stats()
     assert stats["gates_by_type"] == {core.SWITCH: 2, core.AND: 2, core.OR: 3}
     assert stats["aliases_by_type"] == {}
+    assert stats["size"] == 7
     check_behaviour()
 
     # can't merge the first 2 ors
@@ -294,6 +295,7 @@ def test_merge():
     stats = network.get_stats()
     assert stats["gates_by_type"] == {core.SWITCH: 2, core.AND: 2, core.OR: 3}
     assert stats["aliases_by_type"] == {}
+    assert stats["size"] == 7
     check_behaviour()
 
     # merge the ands
@@ -301,6 +303,7 @@ def test_merge():
     stats = network.get_stats()
     assert stats["gates_by_type"] == {core.SWITCH: 2, core.AND: 1, core.OR: 3}
     assert stats["aliases_by_type"] == {core.AND: 1}
+    assert stats["size"] == 7
     check_behaviour()
 
     # merge the ors
@@ -308,6 +311,7 @@ def test_merge():
     stats = network.get_stats()
     assert stats["gates_by_type"] == {core.SWITCH: 2, core.AND: 1, core.OR: 2}
     assert stats["aliases_by_type"] == {core.AND: 1, core.OR: 1}
+    assert stats["size"] == 7
     check_behaviour()
 
     # try it again
@@ -316,6 +320,7 @@ def test_merge():
     stats = network.get_stats()
     assert stats["gates_by_type"] == {core.SWITCH: 2, core.AND: 1, core.OR: 2}
     assert stats["aliases_by_type"] == {core.AND: 1, core.OR: 1}
+    assert stats["size"] == 7
     check_behaviour()
 
     # still can't merge the third ors
@@ -324,4 +329,5 @@ def test_merge():
     stats = network.get_stats()
     assert stats["gates_by_type"] == {core.SWITCH: 2, core.AND: 1, core.OR: 2}
     assert stats["aliases_by_type"] == {core.AND: 1, core.OR: 1}
+    assert stats["size"] == 7
     check_behaviour()
