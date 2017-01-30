@@ -30,6 +30,7 @@ class Node(object):
         return self.outputs
 
     def find(self, path, location=""):
+        """ look up a related node by path """
         if location:
             location = location + "."
         location = location + self.name
@@ -46,12 +47,18 @@ class Node(object):
             return self
 
     def list(self, path):
+        """ look up a related node by path and list it's outputs """
         return [o.name for o in self.find(path).all_outputs]
 
     def watch(self, name):
+        """ set a watch on this node """
         self.network.watch(self.index, name)
 
     def full_name(self):
+        """
+        trace the first inputs back until we find a node with no inputs and return the path from there to here
+        this could be better, jumping across blocks for example
+        """
         possible_inputs = [i for i in self.inputs if ")" not in i.name]
 
         if possible_inputs:
@@ -224,7 +231,7 @@ def link_factory(obj, name1, name2, block, is_output):
 
 
 class Block(object):
-    """ wrapper around a functional block """
+    """ wrapper around a functional block, intended to be used via the decorator below """
 
     def __init__(self, name):
         self.name = name
@@ -234,6 +241,10 @@ class Block(object):
 
 
 def _find_network(thing):
+    """
+    given a bunch of nested stuff find one that has a network property and return it
+    the existance of this speaks to issues with how I'm handling the relations between blocks and nodes and the network
+    """
     if hasattr(thing, "network"):
         return thing.network
     if isinstance(thing, collections.Iterable):

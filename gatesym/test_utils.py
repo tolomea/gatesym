@@ -4,6 +4,7 @@ from gatesym.gates import Switch
 
 
 class BinaryIn(collections.Sequence):
+    """ a block of switches that can be read and written as a python int """
     def __init__(self, network, size, value=0):
         self.switches = [Switch(network) for i in range(size)]
         self.write(value)
@@ -33,6 +34,7 @@ class BinaryIn(collections.Sequence):
 
 
 class BinaryOut(object):
+    """ read a block of gates as a python int """
     def __init__(self, gates):
         self.gates = gates
 

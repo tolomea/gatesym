@@ -21,10 +21,11 @@ Module = collections.namedtuple("Module", "name base_address address_size data_l
 
 def computer(clock, rom_content):
     network = clock.network
+
+    # cpu
     data_in = PlaceholderWord(network, WORD_SIZE)
     pc_in = PlaceholderWord(network, WORD_SIZE)
     pc_write = Placeholder(network)
-
     address, data_out, write_out = cpu_core.cpu_core(clock, data_in, pc_in, pc_write)
 
     # rom
@@ -74,12 +75,13 @@ def computer(clock, rom_content):
         print_module,
     ]
 
+    # bus ties it all together
     data_from_bus, write_lines = bus.bus(address, write_out, [(m.base_address, m.address_size, m.data_lines) for m in modules])
-
     data_in.replace(data_from_bus)
     for write_line, module in zip(write_lines, modules):
         module.write_line.replace(write_line)
 
+    # print out the module sizes
     print("cpu", data_out[0].block.size)
     for module in modules:
         print(module.name, module.data_lines[0].block.size)
@@ -88,6 +90,8 @@ def computer(clock, rom_content):
     return print_write, print_data
 
 
+# the addresses of all the fun stuff
+# useful for remapping symbolic names to literal addresses in an assembler for example
 symbols = dict(
     ADD_A=ADD_BASE,
     ADD_B=ADD_BASE + 1,
