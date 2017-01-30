@@ -1,5 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-
 """ a convenience layer for creating data in the core and debugging it """
 
 import collections
@@ -68,7 +66,7 @@ class Gate(Node):
     """ handles to gates in the core """
 
     def __init__(self, network, index, name, inputs=[]):
-        super(Gate, self).__init__(name)
+        super().__init__(name)
         self.network = network
         self.index = index
         for input_ in inputs:
@@ -90,7 +88,7 @@ class Tie(Gate):
     def __init__(self, network, value):
         value = bool(value)
         index = network.add_gate(core.TIE, self)
-        super(Tie, self).__init__(network, index, "tie")
+        super().__init__(network, index, "tie")
         self.network.write(self.index, value)
 
 
@@ -99,7 +97,7 @@ class Switch(Gate):
     def __init__(self, network, value=False):
         value = bool(value)
         index = network.add_gate(core.SWITCH, self)
-        super(Switch, self).__init__(network, index, "switch")
+        super().__init__(network, index, "switch")
         self.write(value)
 
     def write(self, value):
@@ -112,7 +110,7 @@ class And(Gate):
         assert inputs
         network = inputs[0].network
         index = network.add_gate(core.AND, self)
-        super(And, self).__init__(network, index, "and", inputs)
+        super().__init__(network, index, "and", inputs)
 
 
 class Or(Gate):
@@ -121,7 +119,7 @@ class Or(Gate):
         assert inputs
         network = inputs[0].network
         index = network.add_gate(core.OR, self)
-        super(Or, self).__init__(network, index, "or", inputs)
+        super().__init__(network, index, "or", inputs)
 
 
 def nand(*inputs):
@@ -132,7 +130,7 @@ class Link(Node):
     """ interesting steps along the path between two gates """
 
     def __init__(self, node, name, block, is_output):
-        super(Link, self).__init__(name)
+        super().__init__(name)
         self.block = block
         self.is_output = is_output
         self.node = node
@@ -163,7 +161,7 @@ class Link(Node):
 class Not(Link):
 
     def __init__(self, node):
-        super(Not, self).__init__(node, "not", None, False)
+        super().__init__(node, "not", None, False)
 
     def read(self):
         return not self.node.read()
@@ -176,7 +174,7 @@ class Placeholder(Node):
     """ a placeholder we will replace with a real node later """
 
     def __init__(self, network):
-        super(Placeholder, self).__init__("placeholder")
+        super().__init__("placeholder")
         self.network = network
         self.connected = []
         self.attached = []

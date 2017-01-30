@@ -1,5 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-
 from gatesym import core, gates, test_utils
 from gatesym.modules import jump
 

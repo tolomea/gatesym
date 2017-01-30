@@ -1,5 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-
 from gatesym import core, gates
 from gatesym.blocks import adders
 

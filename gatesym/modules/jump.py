@@ -1,5 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-
 from gatesym.gates import block, And, Or, Not
 from gatesym.blocks.latches import register
 from gatesym.blocks.mux import word_switch, address_decode

@@ -1,5 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-
 from gatesym.core import Network
 from gatesym.gates import Switch
 from gatesym.test_utils import BinaryIn, BinaryOut

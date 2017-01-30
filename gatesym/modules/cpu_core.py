@@ -1,5 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-
 from gatesym.gates import block, And, Or
 from gatesym.blocks.latches import register
 from gatesym.blocks.adders import ripple_incr

@@ -1,5 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-
 from gatesym.gates import And, Or, block
 from gatesym.blocks.adders import ripple_sum
 from gatesym.utils import shuffle_right

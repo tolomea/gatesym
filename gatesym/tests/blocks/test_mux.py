@@ -1,5 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import pytest
 
 from gatesym import core, test_utils
@@ -43,7 +41,7 @@ def test_bit_mux():
 
 def test_word_mux():
     network = core.Network()
-    inputs = [test_utils.BinaryIn(network, 2, value=3-i) for i in range(4)]
+    inputs = [test_utils.BinaryIn(network, 2, value=3 - i) for i in range(4)]
     address = test_utils.BinaryIn(network, 2)
     m = mux.word_mux(address, *inputs)
     res = test_utils.BinaryOut(m)
@@ -51,4 +49,4 @@ def test_word_mux():
     for i in range(4):
         address.write(i)
         network.drain()
-        assert res.read() == 3-i
+        assert res.read() == 3 - i

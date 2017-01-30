@@ -1,5 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-
 """ the actual (and entire) simulation implementation """
 
 import collections
@@ -12,7 +10,7 @@ class _Gate(collections.namedtuple("_Gate", "type_, inputs, neg_inputs, outputs,
     # internal gate format
 
     def __new__(cls, type_, cookies):
-        return super(_Gate, cls).__new__(cls, type_, set(), set(), set(), cookies)
+        return super().__new__(cls, type_, set(), set(), set(), cookies)
 
 
 class Network(object):

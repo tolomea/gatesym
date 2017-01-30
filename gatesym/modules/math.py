@@ -1,5 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-
 from gatesym.gates import block, And
 from gatesym.utils import pad
 from gatesym.blocks.latches import register
