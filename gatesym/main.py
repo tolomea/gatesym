@@ -2,6 +2,7 @@ from gatesym.gates import Switch
 from gatesym import core
 from gatesym.test_utils import BinaryOut
 from gatesym.computer import computer, symbols
+from gatesym.optimizer import optimize
 
 
 def basic_add():
@@ -123,7 +124,17 @@ def main():
     res = BinaryOut(res)
     network.drain()
 
-    for i in range(20000):
+    for k, v in network.get_stats().items():
+        print(k, v)
+    print()
+
+    optimize(network)
+
+    for k, v in network.get_stats().items():
+        print(k, v)
+    print()
+
+    for i in range(5000):
         clock.write(True)
         network.drain()
         output = write.read()
