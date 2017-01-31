@@ -21,18 +21,6 @@ class Network(object):
         self._queue = set()
         self._watches = []
         self._log = []
-        self._aliased = {}
-        self._aliases = collections.defaultdict(set)
-
-    def _real(self, gate_index):
-        """ indirect any aliasing """
-        assert gate_index >= 0
-        return self._aliased.get(gate_index, gate_index)
-
-    def _assert_not_aliased(self, gate_index):
-        """ check that the gate at the given index is not involved in aliasing """
-        assert gate_index >= 0
-        assert gate_index not in self._aliased and not self._aliases[gate_index]
 
     def add_gate(self, type_, cookie=None):
         assert type_ in [TIE, SWITCH, AND, OR]
@@ -42,10 +30,6 @@ class Network(object):
         return index
 
     def add_link(self, source_index, destination_index, negate=False):
-        # you can't alter the network around aliased gates
-        self._assert_not_aliased(destination_index)
-        source_index = self._real(source_index)
-
         dest_gate = self._gates[destination_index]
         assert dest_gate.type_ not in {TIE, SWITCH}
         self._gates[source_index].outputs.add(destination_index)
@@ -58,9 +42,6 @@ class Network(object):
     def _assert_mergable(self, source_index, destination_index):
         assert source_index != destination_index
 
-        self._assert_not_aliased(source_index)
-        assert destination_index not in self._aliased
-
         source_gate = self._gates[source_index]
         dest_gate = self._gates[destination_index]
 
@@ -71,38 +52,10 @@ class Network(object):
 
         return source_gate, dest_gate
 
-    def can_merge(self, source_index, destination_index):
-        try:
-            self._assert_mergable(source_index, destination_index)
-            return True
-        except AssertionError:
-            return False
-
-    def merge(self, source_index, destination_index):
-        source_gate, dest_gate = self._assert_mergable(source_index, destination_index)
-
-        dest_gate.cookies.update(source_gate.cookies)
-        dest_gate.outputs.update(source_gate.outputs)
-        for index in source_gate.outputs:
-            self._assert_not_aliased(index)
-            gate = self._gates[index]
-            if source_index in gate.inputs:
-                gate.inputs.remove(source_index)
-                gate.inputs.add(destination_index)
-            if source_index in gate.neg_inputs:
-                gate.neg_inputs.remove(source_index)
-                gate.neg_inputs.add(destination_index)
-
-        self._gates[source_index] = None
-        self._aliased[source_index] = destination_index
-        self._aliases[destination_index].add(source_index)
-
     def read(self, gate_index):
-        gate_index = self._real(gate_index)
         return self._values[gate_index]
 
     def write(self, gate_index, value):
-        gate_index = self._real(gate_index)
         if self._values[gate_index] != value:
             self._values[gate_index] = value
             self._queue.update(self._gates[gate_index].outputs)
@@ -112,8 +65,6 @@ class Network(object):
         self._queue = set()
 
         for index in queue:
-            index = self._real(index)
-
             gate = self._gates[index]
 
             if gate.type_ == AND:
@@ -171,25 +122,12 @@ class Network(object):
                 gates_by_type[gate.type_] += 1
                 gates_by_type_and_inputs[gate.type_, len(gate.inputs) + len(gate.neg_inputs)] += 1
 
-        aliases_by_type = collections.defaultdict(int)
-        for alias in self._aliased.values():
-            aliases_by_type[self._gates[alias].type_] += 1
-
         return {
             "size": self.get_size(),
             "gates_by_type": gates_by_type,
             "gates_by_type_and_inputs": gates_by_type_and_inputs,
-            "aliases_by_type": aliases_by_type,
         }
 
     def get_size(self):
-        """ total count of all gates and aliases """
-        return len(self._gates)  # works cause we don't actually remove gates from the array when we alias them
-
-    def all_gates(self):
-        for idx, gate in enumerate(self._gates):
-            if gate is not None:
-                yield idx, gate
-
-    def get_gate(self, idx):
-        return self._gates[idx]
+        """ total count of all gates """
+        return len(self._gates)
