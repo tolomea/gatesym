@@ -2,6 +2,7 @@ from gatesym.gates import block, And
 from gatesym.utils import pad
 from gatesym.blocks.latches import register
 from gatesym.blocks.adders import ripple_adder, ripple_subtractor
+from gatesym.blocks.multipliers import ripple_multiplier
 from gatesym.blocks.mux import word_switch, address_decode
 
 
@@ -134,3 +135,34 @@ def combined(clock, write, address, data_in):
     borrow = pad([borrow], len(data_in))
 
     return word_switch(control_lines, a, b, add_res, carry, sub_res, borrow)
+
+
+@block
+def mult(clock, write, address, data_in):
+    """
+    multiplication module
+
+    address  read      write
+    0        A         A
+    1        B         B
+    2        A*B       -
+    3        overflow  -
+    """
+    assert len(address) >= 2
+    address = address[:2]
+
+    control_lines = address_decode(address)
+
+    # A register
+    write_a = And(clock, write, control_lines[0])
+    a = register(data_in, write_a)
+
+    # B register
+    write_b = And(clock, write, control_lines[1])
+    b = register(data_in, write_b)
+
+    # multiplier result and overflow
+    res, overflow = ripple_multiplier(a, b)
+    overflow = pad([overflow], len(data_in))
+
+    return word_switch(control_lines, a, b, res, overflow)

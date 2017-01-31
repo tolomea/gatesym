@@ -69,6 +69,24 @@ def test_subtractor():
         assert res == (v1 < v2)
 
 
+def test_multiplier():
+    helper = Helper(math.mult)
+
+    for i in range(10):
+        v1 = random.randrange(256)
+        helper.write(v1, 0)
+        assert helper.read(0) == v1
+
+        v2 = random.randrange(256)
+        helper.write(v2, 1)
+        assert helper.read(1) == v2
+
+        res = helper.read(2)
+        assert res == (v1 * v2) % 256
+        res = helper.read(3)
+        assert res == ((v1 * v2) > 255)
+
+
 def test_compact_adder():
     helper = Helper(math.compact_add)
 

@@ -13,8 +13,9 @@ RAM_BASE = 0x200
 RAM_SIZE = 8
 ADD_BASE = 0x300
 SUB_BASE = 0x304
-JUMP_BASE = 0x308
-PRINT_BASE = 0x30c
+MULT_BASE = 0x308
+JUMP_BASE = 0x30c
+PRINT_BASE = 0x310
 
 Module = collections.namedtuple("Module", "name base_address address_size data_lines write_line")
 
@@ -42,6 +43,11 @@ def computer(clock, rom_content):
     sub_write = Placeholder(network)
     sub_data = math.sub(clock, sub_write, address, data_out)
     sub_module = Module("sub", SUB_BASE, 2, sub_data, sub_write)
+
+    # mult
+    mult_write = Placeholder(network)
+    mult_data = math.mult(clock, mult_write, address, data_out)
+    mult_module = Module("mult", MULT_BASE, 2, mult_data, mult_write)
 
     # lit
     low_literal_write = Placeholder(network)
@@ -71,6 +77,7 @@ def computer(clock, rom_content):
         ram_module,
         add_module,
         sub_module,
+        mult_module,
         jump_module,
         print_module,
     ]
@@ -101,6 +108,10 @@ symbols = dict(
     SUB_B=SUB_BASE + 1,
     SUB_R=SUB_BASE + 2,
     SUB_C=SUB_BASE + 3,
+    MULT_A=MULT_BASE,
+    MULT_B=MULT_BASE + 1,
+    MULT_R=MULT_BASE + 2,
+    MULT_C=MULT_BASE + 3,
     PRINT=PRINT_BASE,
     JUMP=JUMP_BASE,
     JUMP_DEST=JUMP_BASE + 1,
