@@ -39,19 +39,6 @@ class Network(object):
             dest_gate.inputs.add(source_index)
         self._queue.add(destination_index)
 
-    def _assert_mergable(self, source_index, destination_index):
-        assert source_index != destination_index
-
-        source_gate = self._gates[source_index]
-        dest_gate = self._gates[destination_index]
-
-        assert source_gate.inputs == dest_gate.inputs
-        assert source_gate.neg_inputs == dest_gate.neg_inputs
-        assert source_gate.type_ == dest_gate.type_
-        assert self._values[source_index] == self._values[destination_index]
-
-        return source_gate, dest_gate
-
     def read(self, gate_index):
         return self._values[gate_index]
 
