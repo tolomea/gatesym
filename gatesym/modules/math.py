@@ -1,5 +1,5 @@
 from gatesym.gates import block, And
-from gatesym.utils import pad
+from gatesym.utils import pad, shuffle_right
 from gatesym.blocks.latches import register
 from gatesym.blocks.adders import ripple_adder, ripple_subtractor
 from gatesym.blocks.multipliers import ripple_multiplier
@@ -166,3 +166,28 @@ def mult(clock, write, address, data_in):
     overflow = pad([overflow], len(data_in))
 
     return word_switch(control_lines, a, b, res, overflow)
+
+
+@block
+def shift_right(clock, write, address, data_in):
+    """
+    shift word right by 1 bit aka x2
+
+    address  read      write
+    0        A         A
+    1        A>>1      -
+    2        overflow  -
+    """
+    assert len(address) >= 2
+    address = address[:2]
+
+    control_lines = address_decode(address)
+
+    # register
+    write = And(clock, write)
+    a = register(data_in, write)
+
+    res, overflow = shuffle_right(a, 1)
+    overflow = pad([overflow], len(data_in))
+
+    return word_switch(control_lines, a, res, overflow)

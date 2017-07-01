@@ -9,6 +9,18 @@ def bus(address, write, modules):
     in both cases based on the address lines
     """
 
+    # module prefixes are aligned to their sizes
+    for prefix, size, data_in in modules:
+        assert prefix % 2**size == 0, (prefix, size)
+
+    # module ranges don't overlap
+    _modules = sorted(modules)
+    for a, b in zip(_modules, _modules[1:]):
+        a_start, a_size, _ = a
+        b_start, b_size, _ = b
+        a_end = a_start + 2**a_size - 1
+        assert a_end < b_start
+
     # the control line for each module is based on the relevant address prefix match
     control_lines = []
     for prefix, size, data_in in modules:

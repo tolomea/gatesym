@@ -124,3 +124,18 @@ def test_combined():
         assert res == (v1 - v2) % 256
         res = helper.read(5)
         assert res == (v1 < v2)
+
+
+def test_shift_right():
+    helper = Helper(math.shift_right)
+
+    for i in range(10):
+        v = random.randrange(256)
+        helper.write(v, 0)
+        assert helper.read(0) == v
+
+        res = helper.read(1)
+        assert res == (v * 2) % 256
+
+        overflow = helper.read(2)
+        assert overflow == (v > 127)

@@ -15,7 +15,8 @@ ADD_BASE = 0x300
 SUB_BASE = 0x304
 MULT_BASE = 0x308
 JUMP_BASE = 0x30c
-PRINT_BASE = 0x310
+SHR_BASE = 0x310
+PRINT_BASE = 0x314
 
 Module = collections.namedtuple("Module", "name base_address address_size data_lines write_line")
 
@@ -49,6 +50,11 @@ def computer(clock, rom_content):
     mult_data = math.mult(clock, mult_write, address, data_out)
     mult_module = Module("mult", MULT_BASE, 2, mult_data, mult_write)
 
+    # shift right
+    shr_write = Placeholder(network)
+    shr_data = math.shift_right(clock, shr_write, address, data_out)
+    shr_module = Module("shr", SHR_BASE, 2, shr_data, shr_write)
+
     # lit
     low_literal_write = Placeholder(network)
     low_literal_data = literals.low_literal(clock, low_literal_write, address, data_out, LIT_SIZE)
@@ -80,10 +86,12 @@ def computer(clock, rom_content):
         mult_module,
         jump_module,
         print_module,
+        shr_module,
     ]
 
     # bus ties it all together
-    data_from_bus, write_lines = bus.bus(address, write_out, [(m.base_address, m.address_size, m.data_lines) for m in modules])
+    module_data_lines = [(m.base_address, m.address_size, m.data_lines) for m in modules]
+    data_from_bus, write_lines = bus.bus(address, write_out, module_data_lines)
     data_in.replace(data_from_bus)
     for write_line, module in zip(write_lines, modules):
         module.write_line.replace(write_line)
@@ -117,6 +125,9 @@ symbols = dict(
     JUMP_DEST=JUMP_BASE + 1,
     JUMP_ZERO=JUMP_BASE + 2,
     JUMP_NON_ZERO=JUMP_BASE + 3,
+    SHR_A=SHR_BASE,
+    SHR_R=SHR_BASE + 1,
+    SHR_C=SHR_BASE + 2,
     _LIT=LIT_BASE,
     _RAM=RAM_BASE,
 )
