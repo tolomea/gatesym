@@ -53,7 +53,7 @@ def primes():
         "i", "SUB_A",
         "j", "SUB_B",
         "loop_else", "JUMP_DEST",
-        "SUB_R", "JUMP_ZERO",
+        "SUB_R", "JUMP_IF_ZERO",
 
         # tmp = i
         # mod_loop:
@@ -64,11 +64,11 @@ def primes():
         "j", "SUB_B",
         "mod_loop:",
         "loop_end", "JUMP_DEST",
-        "tmp", "JUMP_ZERO",
+        "tmp", "JUMP_IF_ZERO",
         "tmp", "SUB_A",
         "SUB_R", "tmp",
         "mod_loop", "JUMP_DEST",
-        "SUB_C", "JUMP_ZERO",
+        "SUB_C", "JUMP_IF_ZERO",
 
         # j += 2
         # goto loop_start
