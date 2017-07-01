@@ -57,16 +57,16 @@ def primes():
 
         # tmp = i
         # mod_loop:
-        # tmp -= j
         # if tmp == 0: goto loop_end  # divides equally
+        # tmp -= j
         # if tmp > 0: goto mod_loop  # not done dividing
         "i", "tmp",
         "j", "SUB_B",
         "mod_loop:",
+        "loop_end", "JUMP_DEST",
+        "tmp", "JUMP_ZERO",
         "tmp", "SUB_A",
         "SUB_R", "tmp",
-        "loop_end", "JUMP_DEST",
-        "SUB_A", "JUMP_ZERO",
         "mod_loop", "JUMP_DEST",
         "SUB_C", "JUMP_ZERO",
 
