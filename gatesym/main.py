@@ -40,50 +40,59 @@ def fib():
 
 
 def primes():
-    return assemble(symbols, ["i", "j", "tmp"], [
+    return assemble(symbols, ["i"], [
+        # j is in ADD_B
+        2, "ADD_A",
+
         # i = 3
         # start:
         # j = 3
         # loop_start:
-        # if i == j: goto loop_else  # ran out of numbers to check so i is prime
+        # if i - j == 0: goto loop_else  # ran out of numbers to check so i is prime
         3, "i",
         "start:",
-        3, "j",
+        3, "ADD_B",
         "loop_start:",
         "i", "SUB_A",
-        "j", "SUB_B",
+        "ADD_B", "SUB_B",
         "loop_else", "JUMP_DEST",
         "SUB_R", "JUMP_IF_ZERO",
 
+        # tmp is in SUB_A
         # tmp = i
+        # # while tmp > 0: tmp -= j
         # mod_loop:
-        # if tmp == 0: goto loop_end  # divides equally
+        # if tmp - j < 0: goto mod_end
         # tmp -= j
-        # if tmp > 0: goto mod_loop  # not done dividing
-        "i", "tmp",
-        "j", "SUB_B",
+        # goto mod_loop
+        # mod_end:
+        "i", "SUB_A",
+        "ADD_B", "SUB_B",
+        "mod_end", "JUMP_DEST",
         "mod_loop:",
+        "SUB_C", "JUMP_IF_NON_ZERO",
+        "SUB_R", "SUB_A",
+        "mod_loop", "JUMP",
+        "mod_end:",
+
+        # if tmp == 0: goto loop_end  # divides equally, not prime
         "loop_end", "JUMP_DEST",
-        "tmp", "JUMP_IF_ZERO",
-        "tmp", "SUB_A",
-        "SUB_R", "tmp",
-        "mod_loop", "JUMP_DEST",
-        "SUB_C", "JUMP_IF_ZERO",
+        "SUB_A", "JUMP_IF_ZERO",
 
         # j += 2
+        "ADD_R", "ADD_B",
+
         # goto loop_start
-        2, "ADD_A",
-        "j", "ADD_B",
-        "ADD_R", "j",
         "loop_start", "JUMP",
 
         # loop_else:
         # print i
-        # i += 2
         "loop_else:",
         "i", "PRINT",
+
+        # loop_end:
+        # i += 2
         "loop_end:",
-        2, "ADD_A",
         "i", "ADD_B",
         "ADD_R", "i",
 
@@ -124,11 +133,13 @@ def main():
     res = BinaryOut(res)
     network.drain()
 
-    for i in range(5000):
+    last = 0
+    for i in range(50000):
         clock.write(True)
         network.drain()
         output = write.read()
         clock.write(False)
         network.drain()
         if output:
-            print(res.read())
+            print(i - last, res.read())
+            last = i
