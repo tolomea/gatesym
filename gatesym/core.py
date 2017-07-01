@@ -48,28 +48,26 @@ class Network(object):
             self._queue.update(self._gates[gate_index].outputs)
 
     def step(self):
-        queue = self._queue
-        self._queue = set()
+        queue = set()
+        values = self._values  # localize references for speed
+        gates = self._gates  # localize references for speed
 
-        for index in queue:
-            gate = self._gates[index]
+        for index in self._queue:
+            gate = gates[index]
 
             if gate.type_ == AND:
-                a = [self._values[i] for i in gate.inputs]
-                b = [not self._values[i] for i in gate.neg_inputs]
-                res = all(a + b)
+                res = all(values[i] for i in gate.inputs) and not any(values[i] for i in gate.neg_inputs)
             elif gate.type_ == OR:
-                a = [self._values[i] for i in gate.inputs]
-                b = [not self._values[i] for i in gate.neg_inputs]
-                res = any(a + b)
+                res = any(values[i] for i in gate.inputs) or not all(values[i] for i in gate.neg_inputs)
             else:
                 assert False, gate.type_
 
-            if self._values[index] != res:
-                self._values[index] = res
-                self._queue.update(gate.outputs)
+            if values[index] != res:
+                values[index] = res
+                queue.update(gate.outputs)
 
-        return bool(self._queue)
+        self._queue = queue
+        return bool(queue)
 
     def drain(self):
         count = 0
