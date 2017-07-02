@@ -83,19 +83,23 @@ class Network(object):
 
     def record_log(self):
         new_log = []
-        for name, index in self._watches:
-            new_log.append(int(self.read(index)))
-        self._log.append(new_log)
+        for name, index, negate in self._watches:
+            if negate:
+                new_log.append(int(self.read(index)))
+            else:
+                new_log.append(int(not self.read(index)))
+        if not self._log or new_log != self._log[-1]:
+            self._log.append(new_log)
 
-    def watch(self, gate_index, name):
+    def watch(self, gate_index, name, negate):
         assert not self._log
-        gate_index = self._real(gate_index)
-        self._watches.append((name, gate_index))
+        self._watches.append((name, gate_index, negate))
 
     def print_log(self):
+        self.record_log()
         if self._watches:
-            name_len = max(len(n) for n, i in self._watches)
-            for (name, index), row in zip(self._watches, zip(*self._log)):
+            name_len = max(len(name) for name, _, _ in self._watches)
+            for (name, _, _), row in zip(self._watches, zip(*self._log)):
                 print("{0:{1}} {2}".format(name, name_len, "".join(str(i) for i in row)))
             print()
 

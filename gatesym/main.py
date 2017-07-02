@@ -129,12 +129,13 @@ def main():
     network = core.Network()
     clock = Switch(network)
     write, res = computer(clock, primes())
+    print()
 
     res = BinaryOut(res)
     network.drain()
 
     last = 0
-    for i in range(50000):
+    for i in range(5000):
         clock.write(True)
         network.drain()
         output = write.read()

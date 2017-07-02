@@ -17,7 +17,7 @@ def gated_d_latch(data, clock):
 
 @block
 def ms_d_flop(data, clock):
-    """ a two stage latch that clocks data in on a high clock and out on a low clock """
+    """ a two stage latch that clocks data in on a positive edge and out on a negative edge """
     latch = gated_d_latch(data, clock)
     return gated_d_latch(latch, Not(clock))
 

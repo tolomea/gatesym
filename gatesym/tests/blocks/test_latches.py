@@ -67,26 +67,26 @@ def test_ms_d_flop_timing():
     # clock a 1 through
     data.write(True)
     network.drain()
-    assert not flop.read()
+    assert not flop.read()  # data has no impact
     clock.write(True)
     network.drain()
-    assert not flop.read()
+    assert not flop.read()  # clock high data in
     clock.write(False)
     data.write(False)
     network.drain()
-    assert flop.read()
+    assert flop.read()  # clock low stored data out
 
     # and back to 0
     data.write(False)
     network.drain()
-    assert flop.read()
+    assert flop.read()  # data has no impact
     clock.write(True)
     network.drain()
-    assert flop.read()
+    assert flop.read()  # clock high data in
     clock.write(False)
     data.write(True)
     network.drain()
-    assert not flop.read()
+    assert not flop.read()  # clock low stored data out
 
 
 def test_register():

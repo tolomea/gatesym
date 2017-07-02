@@ -101,6 +101,7 @@ def computer(clock, rom_content):
     for module in modules:
         print(module.name, module.data_lines[0].block.size)
     print("bus", data_from_bus[0].block.size)
+    print("total", network.get_size())
 
     return print_write, print_data
 

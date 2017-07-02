@@ -52,7 +52,7 @@ class Node(object):
 
     def watch(self, name):
         """ set a watch on this node """
-        self.network.watch(self.index, name)
+        self.network.watch(self.index, name, False)
 
     def full_name(self):
         """
@@ -175,6 +175,10 @@ class Not(Link):
 
     def connect_output(self, output, negate):
         return self.node.connect_output(output, not negate)
+
+    def watch(self, name):
+        """ set a watch on this node """
+        self.network.watch(self.index, name, True)
 
 
 class Placeholder(Node):
