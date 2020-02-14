@@ -4,10 +4,10 @@ from gatesym.gates import And, Or, Not, block
 @block
 def address_matches(address_value, address_lines):
     """ does the address_value (an integer) match the current value of the address lines """
-    assert 2**len(address_lines) > address_value
+    assert 2 ** len(address_lines) > address_value
     matches = []
     for i, line in enumerate(address_lines):
-        if address_value & 2**i:
+        if address_value & 2 ** i:
             matches.append(line)
         else:
             matches.append(Not(line))
@@ -18,7 +18,7 @@ def address_matches(address_value, address_lines):
 def address_decode(address, limit=None):
     """ break an address out into individual enable lines """
     if limit is None:
-        limit = 2**len(address)
+        limit = 2 ** len(address)
     return [address_matches(i, address) for i in range(limit)]
 
 
@@ -32,7 +32,7 @@ def bit_switch(control_lines, *data):
 @block
 def bit_mux(address, *data):
     """ select a single bit from the block of bits based on the address """
-    assert 2**len(address) >= len(data)
+    assert 2 ** len(address) >= len(data)
     control_lines = address_decode(address)
     return bit_switch(control_lines, *data)
 

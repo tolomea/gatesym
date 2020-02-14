@@ -5,7 +5,6 @@ from gatesym.modules import math
 
 
 class Helper(object):
-
     def __init__(self, module_func):
         self.network = core.Network()
         self.clock = gates.Switch(self.network)

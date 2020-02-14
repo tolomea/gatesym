@@ -6,7 +6,9 @@ import collections
 TIE, SWITCH, AND, OR = ["tie", "switch", "and", "or"]
 
 
-class _Gate(collections.namedtuple("_Gate", "type_, inputs, neg_inputs, outputs, cookies")):
+class _Gate(
+    collections.namedtuple("_Gate", "type_, inputs, neg_inputs, outputs, cookies")
+):
     # internal gate format
 
     def __new__(cls, type_, cookies):
@@ -14,7 +16,6 @@ class _Gate(collections.namedtuple("_Gate", "type_, inputs, neg_inputs, outputs,
 
 
 class Network(object):
-
     def __init__(self):
         self._gates = []
         self._values = []
@@ -56,9 +57,13 @@ class Network(object):
             gate = gates[index]
 
             if gate.type_ == AND:
-                res = all(values[i] for i in gate.inputs) and not any(values[i] for i in gate.neg_inputs)
+                res = all(values[i] for i in gate.inputs) and not any(
+                    values[i] for i in gate.neg_inputs
+                )
             elif gate.type_ == OR:
-                res = any(values[i] for i in gate.inputs) or not all(values[i] for i in gate.neg_inputs)
+                res = any(values[i] for i in gate.inputs) or not all(
+                    values[i] for i in gate.neg_inputs
+                )
             else:
                 assert False, gate.type_
 
@@ -100,7 +105,9 @@ class Network(object):
         if self._watches:
             name_len = max(len(name) for name, _, _ in self._watches)
             for (name, _, _), row in zip(self._watches, zip(*self._log)):
-                print("{0:{1}} {2}".format(name, name_len, "".join(str(i) for i in row)))
+                print(
+                    "{0:{1}} {2}".format(name, name_len, "".join(str(i) for i in row))
+                )
             print()
 
     def get_stats(self):
@@ -109,7 +116,9 @@ class Network(object):
         for gate in self._gates:
             if gate:
                 gates_by_type[gate.type_] += 1
-                gates_by_type_and_inputs[gate.type_, len(gate.inputs) + len(gate.neg_inputs)] += 1
+                gates_by_type_and_inputs[
+                    gate.type_, len(gate.inputs) + len(gate.neg_inputs)
+                ] += 1
 
         return {
             "size": self.get_size(),

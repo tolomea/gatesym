@@ -9,7 +9,10 @@ def test_find():
     c = gates.Switch(n)
     r, co = adders.full_adder(a, b, c)
     assert a.find("full_adder(0.half_adder(0.and.1).or.1)") is co
-    assert a.find("full_adder(0.half_adder(0.not.and.or.0).half_adder(0.not.and.or.0).0)") is r
+    assert (
+        a.find("full_adder(0.half_adder(0.not.and.or.0).half_adder(0.not.and.or.0).0)")
+        is r
+    )
 
 
 def test_short_cut_find():

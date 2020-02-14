@@ -20,6 +20,7 @@ def tie_word(network, size, value=0):
 
 class PlaceholderWord(collections.Sequence):
     """ an entire word of placeholders """
+
     def __init__(self, network, size):
         self.placeholders = [Placeholder(network) for i in range(size)]
 
@@ -39,7 +40,7 @@ def shuffle_right(word, amount):
     network = word[0].network
     res = [Tie(network, False) for i in range(amount)] + word
     if amount:
-        carry = Or(*res[len(word):])
+        carry = Or(*res[len(word) :])
     else:
         carry = Tie(network, False)
-    return res[:len(word)], carry
+    return res[: len(word)], carry

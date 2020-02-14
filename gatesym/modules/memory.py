@@ -35,7 +35,7 @@ def rom(clock, write, address, data_in, size, data):
     """
     network = clock.network
     data_size = len(data_in)
-    assert len(data) <= 2**len(address)
+    assert len(data) <= 2 ** len(address)
 
     # just ties muxed by address
     control_lines = address_decode(address[:size], len(data))

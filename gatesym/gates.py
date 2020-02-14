@@ -42,7 +42,12 @@ class Node(object):
                 if l.name == head:
                     return l.find(tail, location)
             else:
-                raise ValueError("at " + location + " expected one of " + repr([o.name for o in self.outputs]))
+                raise ValueError(
+                    "at "
+                    + location
+                    + " expected one of "
+                    + repr([o.name for o in self.outputs])
+                )
         else:
             return self
 
@@ -81,7 +86,9 @@ class Gate(Node):
             input_.connect_output(self, False)
 
     def __repr__(self):
-        return "{self.__class__.__name__}<{self.index}>({value})".format(self=self, value=self.read())
+        return "{self.__class__.__name__}<{self.index}>({value})".format(
+            self=self, value=self.read()
+        )
 
     def read(self):
         return self.network.read(self.index)
@@ -91,7 +98,6 @@ class Gate(Node):
 
 
 class Tie(Gate):
-
     def __init__(self, network, value):
         value = bool(value)
         index = network.add_gate(core.TIE, self)
@@ -100,7 +106,6 @@ class Tie(Gate):
 
 
 class Switch(Gate):
-
     def __init__(self, network, value=False):
         value = bool(value)
         index = network.add_gate(core.SWITCH, self)
@@ -112,7 +117,6 @@ class Switch(Gate):
 
 
 class And(Gate):
-
     def __init__(self, *inputs):
         assert inputs
         network = inputs[0].network
@@ -121,7 +125,6 @@ class And(Gate):
 
 
 class Or(Gate):
-
     def __init__(self, *inputs):
         assert inputs
         network = inputs[0].network
@@ -166,7 +169,6 @@ class Link(Node):
 
 
 class Not(Link):
-
     def __init__(self, node):
         super().__init__(node, "not", None, False)
 
@@ -222,7 +224,10 @@ def link_factory(obj, name1, name2, block, is_output):
     if isinstance(obj, collections.Iterable):
         if name1 and not name1.endswith("("):
             name1 = name1 + ","
-        return [link_factory(o, name1 + str(i), name2, block, is_output) for i, o in enumerate(obj)]
+        return [
+            link_factory(o, name1 + str(i), name2, block, is_output)
+            for i, o in enumerate(obj)
+        ]
     elif isinstance(obj, Node):
         link = Link(obj, name1 + name2, block, is_output)
         if is_output:

@@ -14,11 +14,13 @@ RAM_SIZE = 8
 ADD_BASE = 0x300
 SUB_BASE = 0x304
 MULT_BASE = 0x308
-JUMP_BASE = 0x30c
+JUMP_BASE = 0x30C
 SHR_BASE = 0x310
 PRINT_BASE = 0x314
 
-Module = collections.namedtuple("Module", "name base_address address_size data_lines write_line")
+Module = collections.namedtuple(
+    "Module", "name base_address address_size data_lines write_line"
+)
 
 
 def computer(clock, rom_content):
@@ -57,8 +59,12 @@ def computer(clock, rom_content):
 
     # lit
     low_literal_write = Placeholder(network)
-    low_literal_data = literals.low_literal(clock, low_literal_write, address, data_out, LIT_SIZE)
-    low_literal_module = Module("lit", LIT_BASE, LIT_SIZE, low_literal_data, low_literal_write)
+    low_literal_data = literals.low_literal(
+        clock, low_literal_write, address, data_out, LIT_SIZE
+    )
+    low_literal_module = Module(
+        "lit", LIT_BASE, LIT_SIZE, low_literal_data, low_literal_write
+    )
 
     # print
     print_write = Placeholder(network)
@@ -90,7 +96,9 @@ def computer(clock, rom_content):
     ]
 
     # bus ties it all together
-    module_data_lines = [(m.base_address, m.address_size, m.data_lines) for m in modules]
+    module_data_lines = [
+        (m.base_address, m.address_size, m.data_lines) for m in modules
+    ]
     data_from_bus, write_lines = bus.bus(address, write_out, module_data_lines)
     data_in.replace(data_from_bus)
     for write_line, module in zip(write_lines, modules):
