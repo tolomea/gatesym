@@ -2,13 +2,14 @@ from gatesym.gates import Switch
 from gatesym import core
 from gatesym.test_utils import BinaryOut
 from gatesym.computer import computer, symbols
+import string
 
 
 def basic_add():
     return assemble(
         symbols,
         [],
-        [123, "ADD_A", 5, "ADD_B", "ADD_R", "ADD_A", 67, "ADD_B", "ADD_R", "PRINT",],
+        [123, "ADD_A", 5, "ADD_B", "ADD_R", "ADD_A", 67, "ADD_B", "ADD_R", "PRINT"],
     )
 
 
@@ -138,6 +139,14 @@ def primes():
     )
 
 
+def hello_world():
+    program = []
+    for c in "Hello World !":
+        program.extend([ord(c), "PRINT"])
+    program.extend([1, "HALT"])
+    return assemble(symbols, [], program)
+
+
 def assemble(symbols, variables, code):
     symbols = dict(symbols)
     for offset, name in enumerate(variables):
@@ -165,12 +174,13 @@ def assemble(symbols, variables, code):
 def main():
     network = core.Network()
     clock = Switch(network)
-    write, res = computer(clock, primes())
+    write, res, halt = computer(clock, hello_world())
     print()
 
     res = BinaryOut(res)
     network.drain()
 
+    print("cycles int   hex  char")
     last = 0
     for i in range(5000):
         clock.write(True)
@@ -179,5 +189,15 @@ def main():
         clock.write(False)
         network.drain()
         if output:
-            print(i - last, res.read())
+            val = res.read()
+            try:
+                c = chr(val)
+            except:
+                c = "\u2610"
+            if c not in string.ascii_letters + string.digits + string.punctuation + " ":
+                c = "\u2610"
+            print(f"{i - last:6} {val:5} {val:04x} {c}")
             last = i
+        if halt.read():
+            print("explicit halt")
+            break

@@ -17,6 +17,7 @@ MULT_BASE = 0x308
 JUMP_BASE = 0x30C
 SHR_BASE = 0x310
 PRINT_BASE = 0x314
+HALT_BASE = 0x315
 
 Module = collections.namedtuple(
     "Module", "name base_address address_size data_lines write_line"
@@ -83,6 +84,11 @@ def computer(clock, rom_content):
     pc_write.replace(_pc_write)
     jump_module = Module("jump", JUMP_BASE, 2, jump_data, jump_write)
 
+    # halt, using memory is easy but a little overkill
+    halt_write = Placeholder(network)
+    halt_data = memory.memory(clock, halt_write, address, data_out, 0)
+    halt_module = Module("halt", HALT_BASE, 0, halt_data, halt_write)
+
     modules = [
         rom_module,
         low_literal_module,
@@ -93,6 +99,7 @@ def computer(clock, rom_content):
         jump_module,
         print_module,
         shr_module,
+        halt_module,
     ]
 
     # bus ties it all together
@@ -111,7 +118,7 @@ def computer(clock, rom_content):
     print("bus", data_from_bus[0].block.size)
     print("total", network.get_size())
 
-    return print_write, print_data
+    return print_write, print_data, halt_write
 
 
 # the addresses of all the fun stuff
@@ -139,4 +146,5 @@ symbols = dict(
     SHR_C=SHR_BASE + 2,
     _LIT=LIT_BASE,
     _RAM=RAM_BASE,
+    HALT=HALT_BASE,
 )
