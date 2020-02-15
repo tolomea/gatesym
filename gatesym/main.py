@@ -139,12 +139,52 @@ def primes():
     )
 
 
-def hello_world():
+def hello_world_flat():
     program = []
     for c in "Hello World !":
         program.extend([ord(c), "PRINT"])
     program.extend([1, "HALT"])
     return assemble(symbols, [], program)
+
+
+def hello_world_loop():
+    return assemble(
+        symbols,
+        ["c"],
+        [
+            # we're going to keep our pointer in ADD_A so we can increment it easily
+            # ptr = &message
+            "message",
+            "ADD_A",
+            1,
+            "ADD_B",
+            "end",
+            "JUMP_DEST",
+            # c = *ptr
+            "loop:",
+            "*ADD_A",
+            "c",
+            # if not c goto end
+            "c",
+            "JUMP_IF_ZERO",
+            # print c
+            "c",
+            "PRINT",
+            # ptr++
+            "ADD_R",
+            "ADD_A",
+            # goto loop
+            "loop",
+            "JUMP",
+            # halt
+            "end:",
+            1,
+            "HALT",
+            # data
+            "message:",
+            "`Hello World !",
+        ],
+    )
 
 
 def assemble(symbols, variables, code):
@@ -155,34 +195,47 @@ def assemble(symbols, variables, code):
     # collect jump labels
     i = 0
     for c in code:
-        if isinstance(c, str) and c.endswith(":"):
-            symbols[c[:-1]] = symbols["_LIT"] + i
-        else:
+        if isinstance(c, str):
+            if c.endswith(":"):  # label
+                symbols[c[:-1]] = symbols["_LIT"] + i
+            elif c.startswith("`"):  # string literal
+                i += len(c)
+            elif c.startswith("*"):  # indirect reference
+                i += 1
+            else:  # reference
+                i += 1
+        else:  # number
             i += 1
 
     # convert symbols and int's to addresses
     res = []
     for c in code:
         if isinstance(c, str):
-            if not c.endswith(":"):
+            if c.endswith(":"):  # label
+                pass
+            elif c.startswith("`"):  # string literal
+                res.extend(ord(x) for x in c[1:])
+                res.append(0)
+            elif c.startswith("*"):  # indirect reference
+                res.append(symbols[c[1:]] | symbols["INDIRECT"])
+            else:  # reference
                 res.append(symbols[c])
-        else:
+        else:  # number
             res.append(symbols["_LIT"] + c)
     return res
 
 
-def main():
+def run_program(program, limit=5000):
     network = core.Network()
     clock = Switch(network)
-    write, res, halt = computer(clock, hello_world())
-    print()
+    write, res, halt = computer(clock, program)
 
     res = BinaryOut(res)
     network.drain()
 
     print("cycles int   hex  char")
     last = 0
-    for i in range(5000):
+    for i in range(limit):
         clock.write(True)
         network.drain()
         output = write.read()
@@ -199,5 +252,14 @@ def main():
             print(f"{i - last:6} {val:5} {val:04x} {c}")
             last = i
         if halt.read():
-            print("explicit halt")
+            print(f"{i - last:6} explicit halt")
             break
+    else:
+        print(f"{i - last:6} limit reached")
+    print()
+
+
+def main():
+    run_program(hello_world_flat())
+    run_program(hello_world_loop())
+    run_program(primes())

@@ -112,11 +112,12 @@ def computer(clock, rom_content):
         module.write_line.replace(write_line)
 
     # print out the module sizes
-    print("cpu", data_out[0].block.size)
-    for module in modules:
-        print(module.name, module.data_lines[0].block.size)
-    print("bus", data_from_bus[0].block.size)
-    print("total", network.get_size())
+    if 0:
+        print("cpu", data_out[0].block.size)
+        for module in modules:
+            print(module.name, module.data_lines[0].block.size)
+        print("bus", data_from_bus[0].block.size)
+        print("total", network.get_size())
 
     return print_write, print_data, halt_write
 
@@ -147,4 +148,5 @@ symbols = dict(
     _LIT=LIT_BASE,
     _RAM=RAM_BASE,
     HALT=HALT_BASE,
+    INDIRECT=2 ** (WORD_SIZE - 1),
 )

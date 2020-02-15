@@ -101,12 +101,22 @@ The OISC is a move machine, this means all functionality is exposed as memory ma
     +-------------------------+
 ```
 
+# Pointers
+Without some kind of pointer indirection construct the CPU isn't Turing complete.
+Indirection is often implemented as address modes on instruction parameters. Whether to indirect is essentially encoded in the instruction. This basically amounts to having multiple instructions for the same operation with different logic for accessing the arguments. For example "add a literal to a register", "add one register to another" and "dereference a register and add the value at the new address to another register".
+This doesn't work with a OISC because it requires multiple instructions and having only one instruction an OISC has no "instruction" into which the address modes could be encoded.
+The next obvious idea is to implement indirection as a module as we do with all other functionality. However to perform the indirection the module would need to bus master and in the above architecture only the core can bus master and changing that would be complicated.
+The only other option is to encode the address mode into the address itself, perhaps by setting the highest bit. This works but has the side effect of halving the address space as we are reserving what was an address bit to be used as an address mode flag.
+This scheme is implemented in the core.
+
 # Modules
 This directory contains the various modules used in the OISC.
-* cpu_core.py - Holds the PC and implements the core 4 stage loop:
+* cpu_core.py - Holds the PC and implements the core 6 stage loop:
     * fetch address from pc
+    * if high bit of address is set fetch the actual address from this address
     * fetch value from address and increment pc
     * fetch address from pc 
+    * if high bit of address is set fetch the actual address from this address
     * store value to address and increment pc
 * bus.py - Switches the write line to the modules and muxes the data lines coming back to the CPU
 * jump.py - A module that exposes the PC for reading and writing (either directly or conditionally)
